@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music & Computing — Research Notebook</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --panel: #efede7; --card: #ffffff; --ink: #222; --muted: #6b6a66;
+    --line: #dcd9d0; --accent: #3d4f5c; --accent-ink: #fff; --danger: #9b3b33;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1c1d1f; --panel: #232427; --card: #2a2b2f; --ink: #e8e6e1; --muted: #9a9890;
+            --line: #3a3b3f; --accent: #8fa8b8; --accent-ink: #14181b; --danger: #d98077; }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 Georgia, "Iowan Old Style", serif; display: flex; }
+  button, input, textarea, select { font: 14px/1.4 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: inherit; }
+
+  /* left nav */
+  nav { width: 270px; flex: none; background: var(--panel); border-right: 1px solid var(--line);
+        display: flex; flex-direction: column; height: 100vh; }
+  nav header { padding: 18px 18px 12px; border-bottom: 1px solid var(--line); }
+  nav h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: .01em; }
+  nav header p { margin: 2px 0 0; font: 12px -apple-system, Helvetica, sans-serif; color: var(--muted); }
+  #navlist { flex: 1; overflow-y: auto; padding: 8px 0; margin: 0; list-style: none; }
+  #navlist li { padding: 7px 18px; cursor: pointer; display: flex; gap: 8px; align-items: baseline;
+                font: 14px/1.35 -apple-system, Helvetica, sans-serif; border-left: 3px solid transparent; }
+  #navlist li:hover { background: rgba(0,0,0,.04); }
+  #navlist li.active { background: var(--card); border-left-color: var(--accent); font-weight: 600; }
+  #navlist .num { color: var(--muted); font-size: 12px; min-width: 18px; }
+  #navlist .count { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 400; }
+  #navlist li.sep { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 10px; }
+  nav footer { padding: 12px 18px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* main */
+  main { flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
+  .slide { max-width: 860px; margin: 0 auto; padding: 40px 36px 80px; }
+  .slide-title { width: 100%; border: 0; background: transparent; font: 600 28px/1.25 Georgia, serif;
+                 padding: 4px 0; border-bottom: 1px solid transparent; outline: none; }
+  .slide-title:focus, .slide-blurb:focus { border-bottom-color: var(--line); }
+  .slide-blurb { width: 100%; border: 0; background: transparent; resize: none; color: var(--muted);
+                 font: italic 15px/1.55 Georgia, serif; padding: 4px 0; outline: none; border-bottom: 1px solid transparent; overflow: hidden; }
+  h2 { font: 600 12px -apple-system, Helvetica, sans-serif; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--muted); margin: 32px 0 10px; }
+
+  .leads { margin: 0; padding-left: 20px; color: var(--muted); }
+  .leads li { margin: 2px 0; }
+
+  .entry { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .entry input, .entry textarea, .entry select, #notes {
+    border: 1px solid var(--line); background: transparent; border-radius: 4px; padding: 6px 8px; width: 100%; }
+  .entry input:focus, .entry textarea:focus, .entry select:focus, #notes:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .entry .type { width: 120px; flex: none; }
+  .entry .year { width: 110px; flex: none; }
+  .entry .etitle { flex: 1; min-width: 160px; font-weight: 600; }
+  .entry textarea { resize: vertical; min-height: 64px; font-family: Georgia, serif; font-size: 15px; }
+  .entry .meta { display: flex; gap: 8px; }
+  .entry .meta input { flex: 1; }
+  .entry .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .badge { font: 11px -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+  button { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 5px 11px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.danger { color: var(--danger); }
+  button.link { border: 0; background: none; padding: 2px 4px; color: var(--muted); }
+  button.link:hover { color: var(--danger); }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  #notes { min-height: 120px; resize: vertical; font: 15px/1.55 Georgia, serif; background: var(--card); }
+  .pager { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+  /* timeline */
+  .tl { border-left: 2px solid var(--line); margin-left: 6px; padding-left: 18px; }
+  .tl-item { position: relative; margin-bottom: 16px; cursor: pointer; }
+  .tl-item::before { content: ""; position: absolute; left: -24px; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .tl-year { font: 600 13px -apple-system, sans-serif; color: var(--accent); }
+  .tl-title { font-weight: 600; }
+  .tl-src { font: 12px -apple-system, sans-serif; color: var(--muted); }
+  .empty { color: var(--muted); font-style: italic; }
+  #toast { position: fixed; bottom: 16px; right: 16px; background: var(--accent); color: var(--accent-ink); padding: 8px 14px;
+           border-radius: 4px; font: 13px -apple-system, sans-serif; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+
+  @media (max-width: 720px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; max-height: 40vh; }
+    main { height: auto; }
+    .slide { padding: 24px 16px 60px; }
+  }
+  @media print { nav, .toolbar, .pager, button { display: none !important; } main { height: auto; overflow: visible; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <header>
+    <h1>Music &amp; Computing</h1>
+    <p>Research notebook · data collection</p>
+  </header>
+  <ul id="navlist"></ul>
+  <footer>
+    <button id="addSlide">+ Slide</button>
+    <button id="exportJson">Export JSON</button>
+    <button id="exportMd">Export MD</button>
+    <button id="importBtn">Import</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </footer>
+</nav>
+
+<main id="main"></main>
+<div id="toast"></div>
+
+<script>
+const TYPES = ["event", "person", "device", "work", "quote", "idea", "source"];
+const STORE = "music-computing-notebook-v1";
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const SEED = [
+  ["Framing & questions", "What is the thesis? Why music and sound — rather than image or text — as a lens on computing?",
+    ["Candidate research questions", "Definitions: music, sound, computing, 'computer music'", "Historiographic approach and key secondary sources"]],
+  ["Ancient & theoretical roots", "Number, ratio and harmony as early formal systems.",
+    ["Pythagorean tuning and ratios", "Musica universalis / quadrivium", "Greek and medieval notation as formalization", "Guido of Arezzo and the staff"]],
+  ["Mechanical & automatic music", "Programmable machines before electronics.",
+    ["Banu Musa automatic flute player", "Carillons, music boxes, barrel organs", "Player pianos and punched paper rolls", "Jacquard loom and punched cards", "Lovelace's note on the Analytical Engine composing music"]],
+  ["Electrical & electronic instruments", "Sound becomes signal.",
+    ["Telharmonium", "Theremin", "Ondes Martenot", "Analogue synthesizers (Moog, Buchla)", "Musique concrète and tape"]],
+  ["The first computer music", "Early stored-program machines making sound.",
+    ["CSIRAC and Ferranti Mark 1 (c. 1951)", "Max Mathews and MUSIC-N (Bell Labs)", "Illiac Suite and algorithmic composition", "Computers' hardware 'hooter' / console speaker as debugging tool"]],
+  ["Sound as interface & diagnostics", "Beeps, clicks, chimes — sound as a channel between machine and human.",
+    ["Early console audio monitors", "Boot chimes, error beeps", "Modem handshakes and dial-up tones", "Sonification of data", "Accessibility / screen readers"]],
+  ["Synthesis, sampling & standards", "From research labs to commodity technology.",
+    ["FM synthesis (Chowning) and the DX7", "Sampling and the Fairlight / Synclavier", "MIDI (1983)", "Digital audio, CD, MP3 and compression", "DAWs and trackers"]],
+  ["Games, chiptune & home computers", "Constrained sound hardware as creative medium.",
+    ["SID, POKEY, AY chips", "Demoscene", "Tracker music", "Arcade and console sound design"]],
+  ["Theory crossovers", "Where music and computation inform each other conceptually.",
+    ["Signal processing and the Fourier transform", "Formal grammars and generative music", "Information theory and music", "Live coding and algorave", "Machine learning and generative music"]],
+  ["Open questions & synthesis", "Patterns across the history; what remains unclear.", []],
+  ["Bibliography", "Running list of sources to read or cite.", []],
+].map(([title, blurb, leads]) => ({ id: uid(), title, blurb, leads, entries: [], notes: "" }));
+
+let state = load();
+let current = state.slides[0].id;   // slide id, or "timeline"
+
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE));
+    if (s && Array.isArray(s.slides) && s.slides.length) return s;
+  } catch (e) {}
+  return { slides: SEED };
+}
+let saveTimer;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { toast("Could not save to browser storage — export JSON!"); }
+  }, 150);
+}
+function toast(msg) {
+  const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 1800);
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const slideById = id => state.slides.find(s => s.id === id);
+const yearKey = y => { const m = String(y || "").match(/-?\d+/); return m ? parseInt(m[0], 10) : Infinity; };
+
+/* ---------- nav ---------- */
+function renderNav() {
+  const ul = document.getElementById("navlist");
+  ul.innerHTML = state.slides.map((s, i) =>
+    `<li data-id="${s.id}" class="${s.id === current ? "active" : ""}">
+       <span class="num">${i + 1}</span><span>${esc(s.title) || "<em>Untitled</em>"}</span>
+       <span class="count">${s.entries.length || ""}</span></li>`).join("") +
+    `<li data-id="timeline" class="sep ${current === "timeline" ? "active" : ""}"><span class="num">◷</span><span>Timeline (all entries)</span></li>`;
+}
+document.getElementById("navlist").addEventListener("click", e => {
+  const li = e.target.closest("li"); if (li) go(li.dataset.id);
+});
+function go(id) { current = id; render(); document.getElementById("main").scrollTop = 0; }
+
+/* ---------- slides ---------- */
+function render() { renderNav(); current === "timeline" ? renderTimeline() : renderSlide(); }
+
+function renderSlide() {
+  const s = slideById(current); if (!s) { current = state.slides[0].id; return render(); }
+  const i = state.slides.indexOf(s);
+  const prev = state.slides[i - 1], next = state.slides[i + 1];
+  document.getElementById("main").innerHTML = `
+  <section class="slide">
+    <input class="slide-title" value="${esc(s.title)}" placeholder="Slide title" aria-label="Slide title">
+    <textarea class="slide-blurb" rows="1" placeholder="One-line description of what this slide covers">${esc(s.blurb)}</textarea>
+    ${s.leads.length ? `<h2>Leads to look into</h2><ul class="leads">${s.leads.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}
+    <h2>Entries</h2>
+    <div id="entries">${s.entries.length ? s.entries.map(entryHtml).join("") : `<p class="empty">No entries yet. Add facts, quotes, people, devices or sources below.</p>`}</div>
+    <div class="toolbar"><button class="primary" id="addEntry">+ Add entry</button></div>
+    <h2>Free notes</h2>
+    <textarea id="notes" placeholder="Interpretation, connections, things to verify…">${esc(s.notes)}</textarea>
+    <h2>Slide</h2>
+    <div class="toolbar">
+      <button id="mvUp" ${i === 0 ? "disabled" : ""}>↑ Move up</button>
+      <button id="mvDown" ${i === state.slides.length - 1 ? "disabled" : ""}>↓ Move down</button>
+      <button class="danger" id="delSlide">Delete slide</button>
+    </div>
+    <div class="pager">
+      ${prev ? `<button data-go="${prev.id}">← ${esc(prev.title)}</button>` : "<span></span>"}
+      ${next ? `<button data-go="${next.id}">${esc(next.title)} →</button>` : "<span></span>"}
+    </div>
+  </section>`;
+  autosize(document.querySelector(".slide-blurb"));
+}
+
+function entryHtml(e) {
+  return `<div class="entry" data-eid="${e.id}">
+    <div class="row">
+      <select class="type" data-f="type">${TYPES.map(t => `<option ${t === e.type ? "selected" : ""}>${t}</option>`).join("")}</select>
+      <input class="year" data-f="year" placeholder="Year" value="${esc(e.year)}">
+      <input class="etitle" data-f="title" placeholder="Title / name" value="${esc(e.title)}">
+    </div>
+    <textarea data-f="text" placeholder="What happened / what it says / why it matters">${esc(e.text)}</textarea>
+    <div class="meta" style="margin-top:8px">
+      <input data-f="source" placeholder="Source / citation / URL" value="${esc(e.source)}">
+      <input data-f="tags" placeholder="Tags (comma-separated)" value="${esc(e.tags)}">
+    </div>
+    <div class="foot"><span class="badge">${esc(e.type)}</span><button class="link" data-del="${e.id}">Delete</button></div>
+  </div>`;
+}
+
+function autosize(el) { if (!el) return; el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; }
+
+const main = document.getElementById("main");
+main.addEventListener("input", e => {
+  const s = slideById(current); if (!s) return;
+  const t = e.target;
+  if (t.classList.contains("slide-title")) { s.title = t.value; renderNav(); }
+  else if (t.classList.contains("slide-blurb")) { s.blurb = t.value; autosize(t); }
+  else if (t.id === "notes") s.notes = t.value;
+  else if (t.dataset.f) {
+    const en = s.entries.find(x => x.id === t.closest(".entry").dataset.eid);
+    en[t.dataset.f] = t.value;
+    if (t.dataset.f === "type") t.closest(".entry").querySelector(".badge").textContent = t.value;
+  } else return;
+  save();
+});
+main.addEventListener("click", e => {
+  const s = slideById(current), t = e.target;
+  if (t.dataset.go) return go(t.dataset.go);
+  if (t.dataset.del && s && confirm("Delete this entry?")) { s.entries = s.entries.filter(x => x.id !== t.dataset.del); save(); render(); }
+  else if (t.id === "addEntry") {
+    s.entries.push({ id: uid(), type: "event", year: "", title: "", text: "", source: "", tags: "" });
+    save(); render();
+    const list = main.querySelectorAll(".entry"); const last = list[list.length - 1];
+    last.querySelector(".etitle").focus(); last.scrollIntoView({ block: "center" });
+  }
+  else if (t.id === "delSlide") {
+    if (state.slides.length > 1 && confirm(`Delete "${s.title}" and its ${s.entries.length} entries?`)) {
+      const i = state.slides.indexOf(s); state.slides.splice(i, 1);
+      current = state.slides[Math.max(0, i - 1)].id; save(); render();
+    } else if (state.slides.length <= 1) toast("Can't delete the last slide.");
+  }
+  else if (t.id === "mvUp" || t.id === "mvDown") {
+    const i = state.slides.indexOf(s), j = i + (t.id === "mvUp" ? -1 : 1);
+    [state.slides[i], state.slides[j]] = [state.slides[j], state.slides[i]]; save(); render();
+  }
+  else if (t.closest(".tl-item")) {
+    const it = t.closest(".tl-item"); go(it.dataset.sid);
+    setTimeout(() => { const el = main.querySelector(`[data-eid="${it.dataset.eid}"]`); el && el.scrollIntoView({ block: "center" }); }, 0);
+  }
+});
+
+/* ---------- timeline ---------- */
+function renderTimeline() {
+  const all = state.slides.flatMap(s => s.entries.map(e => ({ ...e, sid: s.id, stitle: s.title })))
+    .sort((a, b) => yearKey(a.year) - yearKey(b.year));
+  main.innerHTML = `<section class="slide">
+    <h1 class="slide-title" style="font-size:28px;margin:0">Timeline</h1>
+    <p class="slide-blurb" style="border:0">Every entry across all slides, ordered by year. Click one to jump to it.</p>
+    <h2>${all.length} entr${all.length === 1 ? "y" : "ies"}</h2>
+    ${all.length ? `<div class="tl">${all.map(e => `
+      <div class="tl-item" data-sid="${e.sid}" data-eid="${e.id}">
+        <div class="tl-year">${esc(e.year) || "undated"} · ${esc(e.type)}</div>
+        <div class="tl-title">${esc(e.title) || "<em>Untitled</em>"}</div>
+        <div class="tl-src">${esc(e.stitle)}${e.source ? " · " + esc(e.source) : ""}</div>
+      </div>`).join("")}</div>` : `<p class="empty">Nothing yet.</p>`}
+  </section>`;
+}
+
+/* ---------- toolbar: add / export / import ---------- */
+document.getElementById("addSlide").onclick = () => {
+  const s = { id: uid(), title: "New slide", blurb: "", leads: [], entries: [], notes: "" };
+  state.slides.push(s); save(); go(s.id);
+  const t = main.querySelector(".slide-title"); t.focus(); t.select();
+};
+function download(name, text, type) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const stamp = () => new Date().toISOString().slice(0, 10);
+document.getElementById("exportJson").onclick = () => { download(`music-computing-${stamp()}.json`, JSON.stringify(state, null, 2), "application/json"); toast("Exported JSON"); };
+document.getElementById("exportMd").onclick = () => {
+  const md = ["# Music & Computing — notes\n"];
+  state.slides.forEach((s, i) => {
+    md.push(`## ${i + 1}. ${s.title}\n`);
+    if (s.blurb) md.push(`_${s.blurb}_\n`);
+    s.entries.forEach(e => {
+      md.push(`- **${e.year ? e.year + " — " : ""}${e.title || "Untitled"}** (${e.type})` + (e.text ? `\n  ${e.text.replace(/\n/g, "\n  ")}` : "") +
+        (e.source ? `\n  Source: ${e.source}` : "") + (e.tags ? `\n  Tags: ${e.tags}` : ""));
+    });
+    if (s.entries.length) md.push("");
+    if (s.notes) md.push(`**Notes:** ${s.notes}\n`);
+  });
+  download(`music-computing-${stamp()}.md`, md.join("\n"), "text/markdown"); toast("Exported Markdown");
+};
+document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+document.getElementById("importFile").onchange = ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!Array.isArray(d.slides) || !d.slides.length) throw 0;
+      if (!confirm("Replace the current notebook with the imported file?")) return;
+      state = d; current = state.slides[0].id; save(); render(); toast("Imported");
+    } catch (e) { toast("Not a valid notebook JSON file."); }
+  };
+  r.readAsText(f); ev.target.value = "";
+};
+
+render();
+</script>
+</body>
+</html>

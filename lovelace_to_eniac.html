@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Lovelace to ENIAC — a storyline</title>
+<style>
+  :root {
+    --bg: #faf8f3; --panel: #f1ede3; --card: #fffdf9; --ink: #2a2520; --muted: #786f60;
+    --line: #e2dcca; --accent: #8a5a2b; --accent-soft: #c9a66b; --rule: #d8d0ba;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 17px/1.65 "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+         display: flex; }
+
+  nav { width: 250px; flex: none; background: var(--panel); border-right: 1px solid var(--line);
+        display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+  nav header { padding: 20px 20px 14px; border-bottom: 1px solid var(--line); }
+  nav h1 { margin: 0; font-size: 16px; font-weight: 600; font-family: -apple-system, Helvetica, sans-serif; letter-spacing: .01em; }
+  nav header p { margin: 3px 0 0; font: 12px -apple-system, Helvetica, sans-serif; color: var(--muted); }
+  #navlist { flex: 1; overflow-y: auto; padding: 10px 0; margin: 0; list-style: none; }
+  #navlist li { padding: 9px 20px; cursor: pointer; display: flex; gap: 9px; align-items: baseline;
+                font: 14px/1.4 -apple-system, Helvetica, sans-serif; border-left: 3px solid transparent; }
+  #navlist li:hover { background: rgba(0,0,0,.035); }
+  #navlist li.active { background: var(--card); border-left-color: var(--accent); font-weight: 600; }
+  #navlist .num { color: var(--accent-soft); font-size: 12px; min-width: 16px; font-weight: 600; }
+  nav footer { padding: 12px 20px; border-top: 1px solid var(--line); font: 11px -apple-system, sans-serif; color: var(--muted); }
+
+  main { flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
+  .slide { max-width: 760px; margin: 0 auto; padding: 56px 40px 90px; }
+  .kicker { font: 600 12px -apple-system, Helvetica, sans-serif; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); margin: 0 0 8px; }
+  .slide h1 { font: 600 30px/1.3 "Iowan Old Style", Georgia, serif; margin: 0 0 6px; }
+  .dek { color: var(--muted); font-style: italic; margin: 0 0 36px; font-size: 16px; }
+  h2 { font: 600 20px/1.3 Georgia, serif; color: var(--ink); margin: 38px 0 12px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  p { margin: 0 0 14px; }
+  .lede { font-size: 17px; }
+  ul.points, ol.points { margin: 0 0 14px; padding-left: 22px; }
+  ul.points li, ol.points li { margin-bottom: 10px; }
+  blockquote { margin: 20px 0; padding: 4px 0 4px 18px; border-left: 3px solid var(--accent-soft);
+               font-style: italic; color: #4a4336; }
+  blockquote cite { display: block; margin-top: 6px; font: 12px -apple-system, sans-serif; font-style: normal; color: var(--muted); }
+  .callout { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin: 18px 0; }
+  .callout .label { font: 600 11px -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); margin-bottom: 6px; }
+  figure { margin: 24px 0; text-align: center; }
+  figure svg { max-width: 100%; }
+  figcaption { font: 12px -apple-system, sans-serif; color: var(--muted); margin-top: 8px; }
+  .pager { display: flex; justify-content: space-between; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); }
+  .pager button { font: 14px -apple-system, sans-serif; background: var(--card); border: 1px solid var(--line);
+                   border-radius: 4px; padding: 8px 14px; cursor: pointer; color: var(--ink); }
+  .pager button:hover { border-color: var(--accent); }
+  .sources { font: 13px -apple-system, sans-serif; color: var(--muted); }
+  .sources ul { padding-left: 18px; margin: 6px 0; }
+
+  @media (max-width: 720px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; max-height: 36vh; position: static; }
+    main { height: auto; }
+    .slide { padding: 32px 20px 60px; }
+  }
+  @media print { nav, .pager { display: none !important; } main { height: auto; overflow: visible; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <header>
+    <h1>Lovelace → ENIAC</h1>
+    <p>A storyline on memory, music &amp; machines</p>
+  </header>
+  <ul id="navlist"></ul>
+  <footer>5 slides · scroll or click to jump</footer>
+</nav>
+
+<main id="main"></main>
+
+<script>
+const esc = s => s;
+
+const SLIDES = [
+
+/* ---------------- 1. ADA LOVELACE ---------------- */
+{
+  kicker: "1843",
+  title: "Ada Lovelace: Computing as a General Symbolic Art",
+  dek: "Music gives Lovelace the clearest proof that Babbage's engine is not a calculator but a machine for manipulating relationships between any symbols whatsoever.",
+  body: `
+    <p class="lede">When Ada Lovelace translated Luigi Menabrea's memoir on Babbage's unbuilt Analytical Engine and appended her own extensive notes in 1843, she made a conceptual leap that went well beyond anything Babbage himself had written down. Babbage had built an engine to compute numerical tables; Lovelace saw that the engine's real subject matter was not numbers at all, but the <em>relations</em> that could be defined between symbols following fixed rules — and numbers were simply one convenient case of that.</p>
+
+    <h2>Why music was her proof-of-concept</h2>
+    <p>To make this abstract claim concrete, Lovelace reached for music rather than, say, poetry or chess. Music was useful to her argument precisely because it already behaves like a formal symbolic system: a piece of music can be decomposed into a small, finite alphabet of discrete elements — pitches, durations, dynamics — that combine according to explicit, teachable rules (harmony, counterpoint, metre). That is exactly the kind of structure a machine built to follow explicit rules on symbols could, in principle, manipulate.</p>
+    <blockquote>
+      "Supposing, for instance, that the fundamental relations of pitched sounds in the science of harmony and of musical composition were susceptible of such expression and adaptations, the engine might compose elaborate and scientific pieces of music of any degree of complexity or extent."
+      <cite>— Ada Lovelace, Notes on the Analytical Engine (Note A), 1843</cite>
+    </blockquote>
+
+    <h2>The discrete nature of music</h2>
+    <p>Unlike a continuously varying physical quantity, Western tonal music is already quantised before it is ever performed: pitch is organised into a finite set of named steps (the twelve pitch classes of the chromatic scale), duration is organised into a finite set of ratios (whole, half, quarter, eighth notes, and so on, each a simple fraction of a beat), and even dynamics and articulation are notated as a small vocabulary of discrete markings. This discreteness is what made music, to Lovelace's eye, structurally similar to arithmetic: both are domains where a finite symbol set is operated on by fixed combinatorial rules, rather than domains of continuous, unformalisable sensation.</p>
+
+    <h2>An "algebra" of notes</h2>
+    <p>Lovelace's insight depends on treating the rules of harmony as something like an algebra defined over those discrete symbols. In an algebra, you specify a set of elements and a set of operations (addition, multiplication, inverse) that are allowed to combine them, together with the laws they obey. Music theory does something strikingly parallel: it defines operations on pitch classes — transposition (shift every note by a fixed interval), inversion (flip a melodic contour), retrogression (reverse a sequence in time) — and constrains which resulting combinations are "well-formed" (consonant, resolving correctly, following voice-leading rules) in much the way algebraic laws constrain which expressions are valid. Once harmony is described this way, "composing" becomes a search through legal combinations of symbols under constraints — a problem of exactly the same shape as evaluating a mathematical expression.</p>
+
+    <h2>From music to generalized computing</h2>
+    <p>This is the step that makes Lovelace's observation foundational rather than merely charming. If the Analytical Engine's actual mechanism operates on <em>any</em> symbols subject to formally stated relations — and if music can be reduced to such symbols and relations — then nothing in the engine's design restricts it to quantity. Any domain that can be formalised into discrete symbols plus combination rules becomes, in principle, something the engine could process. This is the conceptual birth of the general-purpose computer: a machine defined not by the kind of data it handles, but by its capacity to execute arbitrary formal rules on arbitrary formal symbols — a full century before "generalized computing" had a name.</p>
+  `,
+  sources: ["Ada Lovelace, \"Notes\" to L. F. Menabrea, Sketch of the Analytical Engine (1843)", "Walter Isaacson, The Innovators, ch. 1", "B. V. Bowden (ed.), Faster Than Thought (1953) — early retrospective on Lovelace's Note G"]
+},
+
+/* ---------------- 2. ENIAC ---------------- */
+{
+  kicker: "1945",
+  title: "ENIAC: Enormous Speed, No Memory",
+  dek: "ENIAC proved electronic computation could be fast — and, by its very design, exposed exactly why a computer needs memory and a stored program.",
+  body: `
+    <p class="lede">The Electronic Numerical Integrator and Computer, built at the University of Pennsylvania and completed in 1945, was the first large-scale electronic general-purpose computer. It was built to calculate artillery firing tables — a task that previously required rooms of human "computers" doing arithmetic by hand for weeks. ENIAC could evaluate a trajectory in about 30 seconds. But its internal organisation was almost nothing like a modern computer, and its limitations are as instructive as its achievements.</p>
+
+    <h2>Twenty accumulators — and that was the memory</h2>
+    <p>ENIAC's working storage consisted of twenty accumulators, each capable of holding one signed ten-digit decimal number. Each accumulator also doubled as an arithmetic unit, able to add or subtract directly into its stored value. There was no separate memory bank: the entire "state" of a computation, at any instant, was whatever was held across those twenty ten-digit registers — around 200 decimal digits in total. Any calculation whose logic required more intermediate values than that simply could not fit inside the machine at once.</p>
+
+    <h2>No stored-program concept</h2>
+    <p>Crucially, a "program" for ENIAC was not data sitting in memory next to the numbers — because there was no concept of memory holding instructions at all. Sequencing of operations was instead wired directly into the machine's hardware: pulses were routed between units through a mass of patch cables plugged into panels, and numerical constants and control settings were dialled in on hundreds of rotary switches on function tables. The "program" existed as a physical configuration of the machine itself, not as something it could read, store, or modify.</p>
+
+    <h2>Reprogramming meant rewiring</h2>
+    <p>Because the program was the wiring, changing what ENIAC computed meant physically changing the machine. Switching from one class of problem to a genuinely different one — famously, from ballistics tables to the far more demanding calculations Los Alamos needed for early thermonuclear weapon design in 1945 — could require technicians (many of them the women who served as ENIAC's original programmers) to spend days or even weeks unplugging and replugging cables and resetting switch banks by hand, consulting wiring diagrams the way one might consult a circuit schematic rather than a modern source listing.</p>
+
+    <h2>No place to put intermediate results</h2>
+    <p>With only twenty numeric registers and no addressable memory, any computation with more intermediate values than the accumulators could hold had to be broken into passes. Partial results were punched out onto IBM punched cards by ENIAC's card-punch unit, and then fed back in through its card reader as input to a later stage of the same overall calculation. The punched card deck effectively served as ENIAC's "secondary storage" — slow, mechanical, and entirely external to the electronic machine, but the only way to carry a numeric result from one phase of a job to the next.</p>
+
+    <div class="callout">
+      <div class="label">What ENIAC could and couldn't do</div>
+      <ul class="points" style="margin-bottom:0">
+        <li><strong>Could:</strong> perform decimal arithmetic at then-unprecedented electronic speed (addition in ~0.2 ms); run a fixed, wired sequence of operations reliably once configured; hold up to twenty numbers of working state.</li>
+        <li><strong>Could not:</strong> store a program as data; modify its own instructions; hold more intermediate values than its twenty accumulators allowed; be reconfigured for a new problem without substantial manual rewiring.</li>
+      </ul>
+    </div>
+  `,
+  sources: ["Scott McCartney, ENIAC: The Triumph and Tragedy of the World's First Computer", "Herman Goldstine, The Computer from Pascal to von Neumann", "Kathy Kleiman, Proving Ground — on ENIAC's women programmers"]
+},
+
+/* ---------------- 3. MERCURY DELAY LINES ---------------- */
+{
+  kicker: "c. 1947–1951",
+  title: "Introducing Memory: Mercury Delay Lines",
+  dek: "Borrowed from wartime radar engineering, the mercury delay line let early computers store hundreds of bits in a single tube of liquid metal, using a fraction of the tubes a flip-flop memory would need.",
+  body: `
+    <p class="lede">ENIAC's twenty-accumulator ceiling made clear that electronic computing needed a genuinely new kind of component: something that could hold many bits of information cheaply, densely, and with far less hardware than one vacuum-tube flip-flop per bit. The answer that bridged ENIAC-era machines to true stored-program computers like EDSAC and UNIVAC I came, unexpectedly, from acoustics.</p>
+
+    <h2>The basic idea: delay as storage</h2>
+    <p>A mercury delay line stores information by keeping it <em>in motion</em>. A pulse of information is converted into a short burst of ultrasonic acoustic vibration and sent travelling down a column of liquid mercury. Sound moves through mercury at roughly 1,450 metres per second — far slower than an electrical signal in a wire — so a tube of mercury only a metre or so long can hold a train of pulses in transit for a useful stretch of time, long enough to encode hundreds of bits one after another along its length.</p>
+
+    <h2>Piezoelectric transducers: the electrical–acoustic bridge</h2>
+    <p>Getting a bit of information into and out of the mercury requires converting between the electrical domain (where the rest of the computer operates) and the acoustic domain (where the mercury line stores it). This conversion is done with piezoelectric crystals, typically quartz. A piezoelectric crystal has the property that an applied electric voltage makes it physically deform, and conversely that deforming it mechanically generates a voltage across it. A crystal bonded to one end of the mercury column is driven electrically, vibrating and launching an acoustic pulse into the mercury; an identical crystal at the far end picks up the arriving acoustic pulse and converts it back into an electrical signal, which is amplified, cleaned up and re-timed, and then — to make the memory persistent — fed straight back to the transmitting crystal so the same train of pulses recirculates indefinitely. This is why delay-line memory is called "dynamic": the bits have to keep circulating to continue existing at all.</p>
+
+    <figure>
+      <svg viewBox="0 0 560 160" width="560" height="160" role="img" aria-label="Diagram of a mercury delay line with piezoelectric transducers at each end and a feedback/recirculation loop">
+        <rect x="40" y="55" width="400" height="50" rx="6" fill="#eef0ee" stroke="#8a5a2b" stroke-width="1.5"/>
+        <text x="240" y="85" text-anchor="middle" font-family="Georgia, serif" font-size="14" fill="#4a4336">mercury column</text>
+        <g stroke="#8a5a2b" stroke-width="1.5" fill="none">
+          <circle cx="245" cy="70" r="3" fill="#8a5a2b"/>
+          <circle cx="270" cy="70" r="3" fill="#8a5a2b"/>
+          <circle cx="295" cy="70" r="3" fill="#8a5a2b"/>
+        </g>
+        <rect x="8" y="50" width="30" height="60" fill="#fffdf9" stroke="#2a2520" stroke-width="1.5"/>
+        <text x="23" y="128" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">crystal A</text>
+        <rect x="442" y="50" width="30" height="60" fill="#fffdf9" stroke="#2a2520" stroke-width="1.5"/>
+        <text x="457" y="128" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">crystal B</text>
+        <path d="M 457 110 C 457 150, 23 150, 23 110" fill="none" stroke="#c9a66b" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="240" y="150" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">amplify, retime, feed back in (recirculate)</text>
+        <path d="M 38 80 L 8 80" stroke="#2a2520" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <path d="M 472 80 L 500 80" stroke="#2a2520" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="500" y="70" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">read out</text>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 z" fill="#8a5a2b"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>Electrical pulses enter as acoustic vibrations at one crystal, travel through the mercury, exit at the other crystal, and are recirculated to keep the stored bits alive.</figcaption>
+    </figure>
+
+    <h2>Why mercury, specifically</h2>
+    <p>Mercury was chosen less for being exotic and more for being practical: its acoustic impedance is a reasonably good match to the piezoelectric crystals, which minimises energy lost to reflections at each end and keeps the recirculating signal clean; its density and the resulting speed of sound gave a workable storage time for tubes of a manageable physical length; and, being a liquid metal, it was chemically stable and simple to contain. The engineering drawback was that the speed of sound in mercury changes with temperature, so the delay (and therefore the timing of every stored bit) would drift unless the mercury tank was kept in a carefully temperature-controlled housing.</p>
+
+    <h2>Why this was such an improvement</h2>
+    <p>The density gain over tube-based flip-flop storage was dramatic. A flip-flop memory needs, at minimum, roughly one vacuum tube circuit per stored bit, so a few hundred bits of memory meant a few hundred power-hungry, heat-generating, failure-prone tubes. A single mercury delay line, by contrast, needed only two piezoelectric transducers and some modest drive and amplification circuitry to store hundreds of bits serially inside one tube of liquid metal — a huge saving in tube count, electrical power, heat, and physical space, at the cost of serial rather than instantaneous access: a particular bit is only available at the instant it happens to be emerging from the line, so the machine must wait for it to recirculate round. This trade-off was accepted gladly, and mercury delay lines became the main memory technology of several of the first true stored-program computers, including Cambridge's EDSAC (1949) and the commercial UNIVAC I.</p>
+  `,
+  sources: ["Maurice Wilkes, Memoirs of a Computer Pioneer (on EDSAC's delay lines)", "Martin Campbell-Kelly & William Aspray, Computer: A History of the Information Machine", "J. P. Eckert, \"A Survey of Digital Computer Memory Systems\" (1953)"]
+},
+
+/* ---------------- 4. DEBUGGING ENIAC ---------------- */
+{
+  kicker: "1945–1955",
+  title: "Debugging by Eye: ENIAC's Neon Bulb Panels",
+  dek: "With no way to inspect a running program's state, ENIAC's operators watched the machine's accumulators glow — turning debugging into an act of visual pattern recognition.",
+  body: `
+    <p class="lede">A modern programmer can pause execution, print a variable, or step through a debugger. ENIAC's operators had none of that: the only output channel during a run was the card punch, which fired at defined points in the calculation, not on demand. So if something went wrong mid-run — and with roughly 17,468 vacuum tubes, something frequently did — there needed to be some way to see the machine's internal numeric state while it was actually computing.</p>
+
+    <h2>A decade of neon bulbs per digit</h2>
+    <p>ENIAC's designers solved this visually. Each accumulator stored its decimal digits using ring counters, and each digit position in a ring counter was fitted with ten small neon indicator bulbs, one for each possible value 0 through 9. At any moment exactly one bulb in each decade ring was lit, showing which digit that position currently held. With twenty accumulators, each holding up to ten decimal digits, the result was a large wall of panels covered in small glowing neon lamps, continuously reflecting the numeric contents of the entire machine.</p>
+
+    <figure>
+      <svg viewBox="0 0 420 110" width="420" height="110" role="img" aria-label="Diagram of a decade ring of ten neon bulbs with one lit to represent a digit value">
+        <text x="10" y="20" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">one decade ring (one decimal digit position):</text>
+        <g>
+          ${Array.from({length: 10}).map((_, i) => {
+            const x = 20 + i * 38;
+            const lit = i === 6;
+            return `<circle cx="${x}" cy="60" r="12" fill="${lit ? '#f3c969' : '#fffdf9'}" stroke="${lit ? '#8a5a2b' : '#d8d0ba'}" stroke-width="1.5"/>
+                    <text x="${x}" y="64" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="${lit ? '#4a4336' : '#b5ac98'}">${i}</text>`;
+          }).join("")}
+        </g>
+        <text x="20" y="95" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">lit bulb = "6" is currently stored in this digit position</text>
+      </svg>
+      <figcaption>Ten neon bulbs per digit, one accumulator decade — repeated across twenty accumulators and up to ten digits each.</figcaption>
+    </figure>
+
+    <h2>Reading the machine's mind by flicker</h2>
+    <p>During a run, trained operators watched these panels for patterns rather than individual digits — a healthy computation produced a particular rhythm of changing lights, and an experienced eye could notice when an accumulator froze, cycled unexpectedly, or produced an implausible overflow pattern. On noticing an anomaly, operators would halt the machine and trace back through the wiring and switch settings to locate the fault — often a single failed vacuum tube among thousands. This made human visual judgement, not any automated check, the machine's only real-time error-detection system.</p>
+
+    <h2>Deliberate single-stepping</h2>
+    <p>ENIAC could also be run in a slowed or single-step mode, executing just one pulse or one addition at a time so operators could watch a specific accumulator's neon display change step by step. This was used deliberately as a diagnostic technique: by stepping the machine through a known calculation one operation at a time and watching exactly when the lights stopped matching the expected sequence, technicians could isolate the precise point of failure amid ENIAC's notoriously frequent tube failures — an early, manual ancestor of the single-step debugger.</p>
+  `,
+  sources: ["Scott McCartney, ENIAC", "Thomas Haigh, Mark Priestley & Crispin Rope, ENIAC in Action", "Smithsonian oral histories of ENIAC's operators"]
+},
+
+/* ---------------- 5. TRANSDUCERS / SOUND ---------------- */
+{
+  kicker: "late 1940s–1950s",
+  title: "From Light to Sound: Transducers Make Computation Audible",
+  dek: "If a changing voltage can be watched as a flickering light, it can also be heard — and engineers on the next generation of machines wired loudspeakers directly to live circuits to listen to programs run.",
+  body: `
+    <p class="lede">ENIAC's neon panels proved a simple principle: an internal electrical state, made to drive a physical indicator, becomes something a human can monitor without interrupting the machine. The generation of machines that followed — the first true stored-program computers — pushed that same principle into a different sense entirely. If a visual transducer (a neon bulb) can expose electrical state to the eye, an acoustic transducer (a loudspeaker) can expose it to the ear.</p>
+
+    <h2>How an electrical-to-acoustic transducer works</h2>
+    <p>A loudspeaker converts an electrical signal into sound using electromagnetism: a coil of wire (the voice coil) is attached to a flexible diaphragm and sits inside the field of a fixed magnet. When a current flows through the coil, it experiences a force proportional to that current, pushing the diaphragm — and the attached coil — back and forth. As the diaphragm moves, it pushes and pulls on the surrounding air, generating pressure waves that travel outward as sound. Connect the coil, through a simple amplifier, directly to a point inside a computer — a register, a bus line, a control signal — and every time the voltage at that point changes, the diaphragm physically jumps in response.</p>
+
+    <figure>
+      <svg viewBox="0 0 520 140" width="520" height="140" role="img" aria-label="Diagram of a circuit signal driving a loudspeaker transducer which produces sound waves">
+        <text x="10" y="20" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">circuit signal (bus / register line)</text>
+        <path d="M10 40 L60 40 L60 25 L90 25 L90 55 L120 55 L120 40 L160 40" fill="none" stroke="#8a5a2b" stroke-width="2"/>
+        <path d="M160 40 L200 40" stroke="#2a2520" stroke-width="1.5" marker-end="url(#arrow2)"/>
+        <rect x="200" y="20" width="26" height="60" fill="#fffdf9" stroke="#2a2520" stroke-width="1.5"/>
+        <text x="213" y="98" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">voice coil</text>
+        <path d="M226 25 L270 10 L270 90 L226 75 Z" fill="#eef0ee" stroke="#2a2520" stroke-width="1.5"/>
+        <text x="248" y="112" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">diaphragm</text>
+        <g stroke="#c9a66b" stroke-width="1.5" fill="none">
+          <path d="M285 50 Q300 30 315 50 Q330 70 345 50"/>
+          <path d="M295 70 Q310 50 325 70 Q340 90 355 70"/>
+        </g>
+        <text x="360" y="40" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">sound waves</text>
+        <defs>
+          <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 z" fill="#2a2520"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>A changing circuit voltage drives the voice coil, moving the diaphragm and producing sound whose rhythm mirrors the signal's switching pattern.</figcaption>
+    </figure>
+
+    <h2>Why this made a useful debugging tool</h2>
+    <p>A single toggle produces a single click. A fast, regularly repeating pattern of toggles — such as a tight loop in a running program — produces a steady buzzing tone, whose pitch rises and falls with how quickly the loop repeats. The human ear is extremely good at noticing small changes in rhythm and timbre, often better and faster than the eye is at scanning a panel of lights. That made a loudspeaker wired to a live signal a strikingly effective real-time monitor: an operator could learn to recognise the characteristic sound of a correctly running program, and immediately notice when a loop stalled (the tone drops to silence or a fixed hum), ran away unexpectedly (the tone's pattern changes), or a program crashed (the characteristic sound stops altogether).</p>
+
+    <h2>Carrying the idea forward</h2>
+    <p>Several of the earliest stored-program machines adopted exactly this technique deliberately. CSIRAC in Australia and a number of Cambridge- and Manchester-lineage machines in Britain wired a loudspeaker to a control or accumulator line specifically so that operators could monitor a program's execution by ear while it ran — turning ENIAC's visual, neon-bulb monitoring into an auditory one, and in the process producing what is very plausibly the first deliberate, functional use of computer-generated sound: not music, not an alert tone, but the sound of computation itself made audible through a transducer, directly continuing the lineage this project traces from Lovelace's symbolic music through ENIAC's blinking lights.</p>
+  `,
+  sources: ["Doug McCann & Peter Thorne, The INS and Outs of CSIRAC (on CSIRAC's speaker)", "Simon Lavington, Early British Computers", "Paul Doornbusch, \"Computer Sound Synthesis in 1951: The Music of CSIRAC\""]
+},
+
+];
+
+function render() {
+  const navHtml = SLIDES.map((s, i) =>
+    `<li data-i="${i}"><span class="num">${i + 1}</span><span>${s.title.split(":")[0]}</span></li>`
+  ).join("");
+  document.getElementById("navlist").innerHTML = navHtml;
+
+  const main = document.getElementById("main");
+  main.innerHTML = SLIDES.map((s, i) => `
+    <section class="slide" id="slide-${i}">
+      <p class="kicker">${s.kicker}</p>
+      <h1>${s.title}</h1>
+      <p class="dek">${s.dek}</p>
+      ${s.body}
+      <div class="sources">
+        <strong>Sources to verify / cite</strong>
+        <ul>${s.sources.map(src => `<li>${src}</li>`).join("")}</ul>
+      </div>
+      <div class="pager">
+        ${i > 0 ? `<button data-go="${i - 1}">← ${SLIDES[i-1].title.split(":")[0]}</button>` : "<span></span>"}
+        ${i < SLIDES.length - 1 ? `<button data-go="${i + 1}">${SLIDES[i+1].title.split(":")[0]} →</button>` : "<span></span>"}
+      </div>
+    </section>
+  `).join("");
+
+  mark(0);
+}
+
+function go(i) {
+  document.getElementById(`slide-${i}`).scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function mark(i) {
+  document.querySelectorAll("#navlist li").forEach(li => li.classList.toggle("active", +li.dataset.i === i));
+}
+
+document.getElementById("navlist").addEventListener("click", e => {
+  const li = e.target.closest("li"); if (li) go(+li.dataset.i);
+});
+document.getElementById("main").addEventListener("click", e => {
+  if (e.target.dataset.go !== undefined) go(+e.target.dataset.go);
+});
+
+render();
+
+// highlight nav entry by scroll position
+const main = document.getElementById("main");
+main.addEventListener("scroll", () => {
+  const sections = [...document.querySelectorAll(".slide")];
+  let idx = 0;
+  for (let i = 0; i < sections.length; i++) {
+    if (sections[i].getBoundingClientRect().top - main.getBoundingClientRect().top < 120) idx = i;
+  }
+  mark(idx);
+}, { passive: true });
+</script>
+</body>
+</html>
