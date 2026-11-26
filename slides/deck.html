@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sound Of Machine</title>
+<link rel="stylesheet" href="global.css">
+<link rel="stylesheet" href="stage.css">
+<!--
+  THE DECK. Built from the layouts in layouts.html.
+  Pictures: files live in slides/img/ and are named m{movement}-{subject}.{ext}
+  (see the naming rule in global.css). Each <figure class="pic"> has a data-id that matches
+  its file name; add <img src="img/<data-id>.<ext>" alt="…"> inside it when the picture is ready.
+  Press E in the browser to position / crop pictures, N for speaker notes.
+-->
+</head>
+<body class="theatre-on" data-stage="theatre">
+<div class="deck">
+
+<!-- ================================================================
+     TITLE
+     ================================================================ -->
+<section class="slide l-title" data-title="The Sound Of Machine" data-transition="iris">
+  <!-- Prelude from The Sound of Music: put your copy at audio/m00-sound-of-music-prelude.mp3 -->
+  <audio class="slide-sound" src="audio/m00-sound-of-music-prelude.mp3" data-vol=".85" preload="auto"></audio>
+  <div class="cover">
+    <p class="kicker" data-anim="fade" style="--d:.3s">Breaking Down the Contributions of Sound and Music in the Development of Computers</p>
+    <h1 data-anim="ink" style="--d:.5s">The Sound Of Machine (and Music)</h1>
+    <svg class="staff" viewBox="0 0 820 120" data-anim="draw" style="--d:1s" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="1.6" fill="none">
+        <path pathLength="1" d="M0 20 H820"/><path pathLength="1" d="M0 40 H820"/><path pathLength="1" d="M0 60 H820"/>
+        <path pathLength="1" d="M0 80 H820"/><path pathLength="1" d="M0 100 H820"/>
+        <path pathLength="1" d="M410 20 V100" stroke-width="2"/>
+      </g>
+      <g fill="currentColor">
+        <g data-anim="fade" style="--d:1.9s"><ellipse cx="120" cy="90" rx="11" ry="8" transform="rotate(-20 120 90)"/><path d="M130 88 V36" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.1s"><ellipse cx="200" cy="70" rx="11" ry="8" transform="rotate(-20 200 70)"/><path d="M210 68 V16" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.3s"><ellipse cx="280" cy="50" rx="11" ry="8" transform="rotate(-20 280 50)"/><path d="M270 52 V104" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.5s"><ellipse cx="350" cy="60" rx="11" ry="8" transform="rotate(-20 350 60)"/><path d="M340 62 V114" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.7s"><rect x="480" y="58" width="40" height="4"/><rect x="560" y="38" width="40" height="4"/><rect x="640" y="58" width="40" height="4"/><rect x="720" y="38" width="40" height="4"/></g>
+      </g>
+    </svg>
+    
+    <div class="byline" data-anim="fade" style="--d:2.4s">History &amp; Philosophy of Computing · 2026</div>
+    <div class="byline" data-anim="fade" style="--d:2.4s">Palak Raisinghani</div>
+  </div>
+  <aside class="notes">
+    <p>This talk follows one thread through the history of computing: music, and sound more broadly, as a way of understanding what a computer is.</p>
+    <p>The staff shows the two ends of the story. On the left, written notes: music as symbols, which is where Lovelace starts. On the right, on/off blocks: the 1-bit "notes" the first computers played a century later.</p>
+  </aside>
+</section>
+
+<!-- ================================================================
+     SCENE I · THE SYMBOLIC ENGINE  (text from LIST.md, "Exact Text")
+     ================================================================ -->
+
+<section class="slide l-chapter dark no-runner" data-title="Scene I: From Numbers to Symbols" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Scene I</div>
+    <h2 data-anim="ink" style="--d:1.4s">From Numbers to Symbols</h2>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext" data-title="We begin with Babbage" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <p class="say" data-anim="ink" style="--d:.3s">We begin our story from Charles Babbage.</p>
+    <p class="lead" data-anim="rise" style="--d:1.4s">We take no interest in his interest in Cabbage.</p>
+  </div>
+</section>
+
+<section class="slide l-split bigtext" data-title="Babbage's Difference Engine" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">Charles Babbage</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Charles Babbage started working on a Difference Engine in 1819, for which he received funding from the British government. </p>
+      
+    </div>
+    <figure data-id="m01-babbage-portrait" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Portrait" data-label="Charles Babbage.">
+      <img src="img/m01-babbage-portrait.webp" alt="Engraved portrait of Charles Babbage">
+      <figcaption><span class="figno">Fig. 1</span>Charles Babbage.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-split flip bigtext" data-title="Mathematical tables" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The Difference Engine</p>
+      <p class="say" data-anim="rise" style="--d:.3s">The engine was aimed at calculating accurate mathematical tables, especially logarithmic and trigonometric tables. These were useful in navigation and astronomy.</p>
+    </div>
+    <figure data-id="m01-babbage-difference-engine" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Artefact" data-label="Babbage's Difference Engine.">
+      <img src="img/m01-babbage-difference-engine.webp" alt="Engraving of Babbage's Difference Engine, a tall stack of toothed wheels">
+      <figcaption><span class="figno">Fig. 2</span>Babbage's Difference Engine.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-split bigtext" data-title="The Analytical Engine" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The Analytical Engine</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Soon Babbage got the idea for building a more complex “Analytical Engine” which would be able to do any arithmetic calculations. It was designed to be programmable.  </p>
+      <p class="lead" data-anim="rise" style="--d:1.4s">For this </p>
+    </div>
+    <figure data-id="m01-babbage-analytical-engine-sketch" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Drawing" data-label="Babbage's drawing of the Analytical Engine.">
+      <img src="img/m01-babbage-analytical-engine-sketch.webp" alt="Charles Babbage's drawing of the Analytical Engine">
+      <figcaption><span class="figno">Fig. 3</span>Babbage's drawing of the Analytical Engine.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-split flip bigtext" data-title="Enter Ada Lovelace" data-chapter="Scene I · From Numbers to Symbols" style="--split: 1.2fr 1fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">Ada Lovelace · 1815–1852</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Next in our story is Ada Lovelace, with a love for logic and an eye for the future, she worked ahead of her time and space.</p>
+    </div>
+    <figure data-id="m01-lovelace-portrait" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Photograph" data-label="Ada Lovelace, watercolour by A. E. Chalon (c. 1840).">
+      <img src="img/m01-lovelace-portrait.jpg" alt="Watercolour portrait of Ada Lovelace by Alfred Edward Chalon, about 1840">
+      <figcaption><span class="figno">Fig. 4</span>Ada Lovelace, watercolour by A. E. Chalon (c. 1840).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-split bigtext dense ada-merge" data-title="Ada Lovelace and the Analytical Engine" data-chapter="Scene I · From Numbers to Symbols" style="--split: 1.55fr 1fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The first computer programmer</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Ada Lovelace was asked to translate a document on the analytical engine from French to English. She expanded its functionality in the process.</p>
+      <p class="lead step">She worked closely in collaboration with Charles Babbage, as she added appendices and converted the formulae for Bernoulli numbers into a step-by-step program.</p>
+      <p class="lead step">While Babbage wrote the first computer program, Ada Lovelace is credited as the first computer programmer for the step-by-step program she developed for the computation of Bernoulli numbers.</p>
+    </div>
+    <figure data-id="m01-lovelace-note-g" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Document" data-label="From Lovelace's notes on the Analytical Engine (Note G, 1843).">
+      <img src="img/m01-lovelace-note-g.webp" alt="Lovelace's Note G: the table of operations for computing Bernoulli numbers (1843)">
+      <figcaption><span class="figno">Fig. 5</span>From Lovelace's notes on the Analytical Engine (Note G, 1843).</figcaption>
+    </figure>
+  </div>
+  <aside class="notes"><p>Babbage had sketched programs for the engine before, but Lovelace's Note G (1843) is the first complete, published step-by-step algorithm written for a machine: the table on the right traces every operation and variable needed to compute the Bernoulli numbers.</p></aside>
+</section>
+
+<section class="slide l-statement bigtext" data-title="Composing music" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Ada Lovelace</p>
+    <p class="say" data-anim="ink" style="--d:.3s">This is where she realized that such an engine that can manipulate numbers can be used for various purposes such as for composing music.</p>
+    <p class="lead step">Marking the Conceptual birth of general purpose Computers</p>
+  </div>
+</section>
+
+<section class="slide l-plate bigtext" data-title="Music follows algebraic laws" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <div class="plate" data-anim="fade" style="--d:.1s">
+      <div class="plate-head"><span>Plate I</span><span class="t">An Algebra of Notes</span><span>Fig. 6</span></div>
+      <svg viewBox="0 0 1180 400" data-anim="draw" style="--d:.3s" role="img" aria-label="One five-note motif shown four ways: as written, transposed up, inverted, and reversed, each labelled with its rule">
+        <text class="head" x="155" y="80" text-anchor="middle">ORIGINAL</text>
+        <path class="ink" pathLength="1" d="M20 250 H290" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M20 230 H290" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M20 210 H290" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M20 190 H290" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M20 170 H290" style="stroke-width:1.2"/>
+        <g data-anim="fade" style="--d:1.00s"><ellipse class="note" cx="70" cy="230" rx="11" ry="8" transform="rotate(-20 70 230)"/><path class="stem" d="M80 227 V172"/></g>
+        <g data-anim="fade" style="--d:1.08s"><ellipse class="note" cx="115" cy="210" rx="11" ry="8" transform="rotate(-20 115 210)"/><path class="stem" d="M125 207 V152"/></g>
+        <g data-anim="fade" style="--d:1.16s"><ellipse class="note" cx="160" cy="190" rx="11" ry="8" transform="rotate(-20 160 190)"/><path class="stem" d="M170 187 V132"/></g>
+        <g data-anim="fade" style="--d:1.24s"><ellipse class="note" cx="205" cy="200" rx="11" ry="8" transform="rotate(-20 205 200)"/><path class="stem" d="M215 197 V142"/></g>
+        <g data-anim="fade" style="--d:1.32s"><ellipse class="note" cx="250" cy="220" rx="11" ry="8" transform="rotate(-20 250 220)"/><path class="stem" d="M260 217 V162"/></g>
+        <text class="lbl" x="155" y="320" text-anchor="middle" style="fill:var(--ink)">x</text>
+        <text class="cap" x="155" y="362" text-anchor="middle">THE MOTIF</text>
+        <path class="fine" pathLength="1" d="M301 110 V370" style="opacity:.45"/>
+        <text class="head" x="447" y="80" text-anchor="middle">TRANSPOSITION</text>
+        <path class="ink" pathLength="1" d="M312 250 H582" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M312 230 H582" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M312 210 H582" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M312 190 H582" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M312 170 H582" style="stroke-width:1.2"/>
+        <g data-anim="fade" style="--d:1.45s"><ellipse class="note-a" cx="362" cy="210" rx="11" ry="8" transform="rotate(-20 362 210)"/><path class="stem-a" d="M372 207 V152"/></g>
+        <g data-anim="fade" style="--d:1.53s"><ellipse class="note-a" cx="407" cy="190" rx="11" ry="8" transform="rotate(-20 407 190)"/><path class="stem-a" d="M417 187 V132"/></g>
+        <g data-anim="fade" style="--d:1.61s"><ellipse class="note-a" cx="452" cy="170" rx="11" ry="8" transform="rotate(-20 452 170)"/><path class="stem-a" d="M462 167 V112"/></g>
+        <g data-anim="fade" style="--d:1.69s"><ellipse class="note-a" cx="497" cy="180" rx="11" ry="8" transform="rotate(-20 497 180)"/><path class="stem-a" d="M507 177 V122"/></g>
+        <g data-anim="fade" style="--d:1.77s"><ellipse class="note-a" cx="542" cy="200" rx="11" ry="8" transform="rotate(-20 542 200)"/><path class="stem-a" d="M552 197 V142"/></g>
+        <text class="lbl" x="447" y="320" text-anchor="middle" style="">x + 2</text>
+        <text class="cap" x="447" y="362" text-anchor="middle">SHIFT EVERY NOTE</text>
+        <path class="fine" pathLength="1" d="M593 110 V370" style="opacity:.45"/>
+        <text class="head" x="739" y="80" text-anchor="middle">INVERSION</text>
+        <path class="ink" pathLength="1" d="M604 250 H874" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M604 230 H874" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M604 210 H874" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M604 190 H874" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M604 170 H874" style="stroke-width:1.2"/>
+        <g data-anim="fade" style="--d:1.90s"><ellipse class="note-a" cx="654" cy="190" rx="11" ry="8" transform="rotate(-20 654 190)"/><path class="stem-a" d="M664 187 V132"/></g>
+        <g data-anim="fade" style="--d:1.98s"><ellipse class="note-a" cx="699" cy="210" rx="11" ry="8" transform="rotate(-20 699 210)"/><path class="stem-a" d="M709 207 V152"/></g>
+        <g data-anim="fade" style="--d:2.06s"><ellipse class="note-a" cx="744" cy="230" rx="11" ry="8" transform="rotate(-20 744 230)"/><path class="stem-a" d="M754 227 V172"/></g>
+        <g data-anim="fade" style="--d:2.14s"><ellipse class="note-a" cx="789" cy="220" rx="11" ry="8" transform="rotate(-20 789 220)"/><path class="stem-a" d="M799 217 V162"/></g>
+        <g data-anim="fade" style="--d:2.22s"><ellipse class="note-a" cx="834" cy="200" rx="11" ry="8" transform="rotate(-20 834 200)"/><path class="stem-a" d="M844 197 V142"/></g>
+        <text class="lbl" x="739" y="320" text-anchor="middle" style="">8 − x</text>
+        <text class="cap" x="739" y="362" text-anchor="middle">MIRROR THE CONTOUR</text>
+        <path class="fine" pathLength="1" d="M885 110 V370" style="opacity:.45"/>
+        <text class="head" x="1031" y="80" text-anchor="middle">RETROGRADE</text>
+        <path class="ink" pathLength="1" d="M896 250 H1166" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M896 230 H1166" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M896 210 H1166" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M896 190 H1166" style="stroke-width:1.2"/>
+        <path class="ink" pathLength="1" d="M896 170 H1166" style="stroke-width:1.2"/>
+        <g data-anim="fade" style="--d:2.35s"><ellipse class="note-a" cx="946" cy="220" rx="11" ry="8" transform="rotate(-20 946 220)"/><path class="stem-a" d="M956 217 V162"/></g>
+        <g data-anim="fade" style="--d:2.43s"><ellipse class="note-a" cx="991" cy="200" rx="11" ry="8" transform="rotate(-20 991 200)"/><path class="stem-a" d="M1001 197 V142"/></g>
+        <g data-anim="fade" style="--d:2.51s"><ellipse class="note-a" cx="1036" cy="190" rx="11" ry="8" transform="rotate(-20 1036 190)"/><path class="stem-a" d="M1046 187 V132"/></g>
+        <g data-anim="fade" style="--d:2.59s"><ellipse class="note-a" cx="1081" cy="210" rx="11" ry="8" transform="rotate(-20 1081 210)"/><path class="stem-a" d="M1091 207 V152"/></g>
+        <g data-anim="fade" style="--d:2.67s"><ellipse class="note-a" cx="1126" cy="230" rx="11" ry="8" transform="rotate(-20 1126 230)"/><path class="stem-a" d="M1136 227 V172"/></g>
+        <text class="lbl" x="1031" y="320" text-anchor="middle" style="">reverse(x)</text>
+        <text class="cap" x="1031" y="362" text-anchor="middle">PLAY IT BACKWARDS</text>
+        </svg>
+      <p class="plate-legend" data-anim="fade" style="--d:1.8s">Music follows algebraic laws, and any such system whose rules can be formalized can essentially be operated on by the machine Babbage had designed.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext dense" data-title="Music enters computing" data-chapter="Scene I · From Numbers to Symbols">
+  <div class="content">
+    <p class="say" data-anim="ink" style="--d:.3s">Thus music set its foot into the world of computers and machines.</p>
+    <p class="lead" data-anim="rise" style="--d:1s">So far it has just been an inspiration - a supporting case, soon it becomes more integral.</p>
+    <hr class="sep step">
+    <p class="lead step">As time passed by ... Many more machines were built each one better than the one before.</p>
+    <p class="lead step">One of these is worthy of mention: <em>The ENIAC - Completed 1945</em></p>
+  </div>
+</section>
+
+<!-- ================================================================
+     SCENE II · THE ENIAC: introduction, drawbacks, the three problems
+     ================================================================ -->
+
+<section class="slide l-chapter dark no-runner" data-title="Scene II: The ENIAC" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Scene II</div>
+    <div class="year" data-anim="type" style="--d:.7s; --speed:160ms">1945</div>
+    <h2 data-anim="ink" style="--d:1.4s">The ENIAC</h2>
+  </div>
+</section>
+
+<section class="slide l-bleed no-runner" data-title="The ENIAC" data-chapter="Scene II · The ENIAC">
+  <figure data-id="m02-eniac" class="pic bleed plain kenburns" style="--fy:62%; --kb-x:-2%; --kb-y:-1.5%" data-kind="Photograph" data-label="The ENIAC">
+    <img src="img/m02-eniac.jpg" alt="The ENIAC: long walls of panels covered in cables, with two programmers at work">
+  </figure>
+  <div class="band">
+    <p class="kicker" data-anim="fade" style="--d:.6s">The ENIAC</p>
+    <p data-anim="rise" style="--d:1s">Glen Beck (background) and Betty Snyder (foreground) programming ENIAC at the Ballistic Research Laboratory. U.S. Army photo.</p>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext dense" data-title="The first general purpose computer" data-chapter="Scene II · The ENIAC">
+  <div class="content">
+    <p class="kicker" data-anim="fade">The ENIAC</p>
+    <p class="say" data-anim="ink" style="--d:.3s">It is known as the first General Purpose Computer - A machine that can be programmed to perform different tasks.</p>
+    <p class="lead" data-anim="rise" style="--d:1s"><em>What the ENIAC allowed</em> · Reprogrammability: one machine, many different problems.</p>
+    <ul class="list">
+      <li class="step">Artillery firing tables, the job it was built for</li>
+      <li class="step">Calculations for Los Alamos, its first real problem (1945)</li>
+      <li class="step">The first computer weather forecasts (1950)</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Earlier machines did one fixed job. ENIAC could be set up for entirely different calculations, which is what "general purpose" means. Press → to reveal each example. The cost of that flexibility is the next slides: every new problem meant rewiring it by hand.</p></aside>
+</section>
+
+<section class="slide l-summary bigtext dense" data-title="The ENIAC's shortcomings" data-chapter="Scene II · The ENIAC">
+  <div class="content">
+    <p class="kicker" data-anim="fade">The ENIAC's shortcomings</p>
+    <p class="say" data-anim="ink" style="--d:.3s">But it had several drawbacks and limitations which were recognized and it was deemed essential to fix and improve on them.</p>
+    <div class="flaws">
+      <div class="flaw step" style="--c:var(--orange)">
+        <span class="no">I</span>
+        <h3>Memory</h3>
+        <p>Only 20 accumulators with 10 digits each. Power-hungry tubes made it hard to scale.</p>
+      </div>
+      <div class="flaw step" style="--c:var(--pink)">
+        <span class="no">II</span>
+        <h3>Reprogramming</h3>
+        <p>No stored program. Every new problem meant rewiring it by hand.</p>
+      </div>
+      <div class="flaw step" style="--c:var(--blue)">
+        <span class="no">III</span>
+        <h3>Debugging</h3>
+        <p>Reading bulbs and logging values by hand took a lot of man hours.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p>Press → to bring in each shortcoming. We now take them one at a time, memory first, then reprogramming, then debugging: for each, first the problem, then how it was solved.</p></aside>
+</section>
+
+<!-- ================================================================
+     SCENE III · ADDRESSING THE MEMORY PROBLEM (problem, then solution)
+     ================================================================ -->
+
+<section class="slide l-chapter dark no-runner" data-title="Scene III: Addressing the ENIAC's Memory Problem" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Scene III</div>
+    <h2 data-anim="ink" style="--d:1s">Addressing the ENIAC's Memory Problem</h2>
+  </div>
+</section>
+
+<section class="slide l-bignum bigtext dense" data-title="20 accumulators" data-chapter="Scene III · Addressing the ENIAC's Memory Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Problem I · Limited working memory</p>
+    <div class="bignum" data-count="20" data-dur="1600" data-delay="300">20</div>
+    <div class="bignum-label" data-anim="rise" style="--d:.6s">The Eniac was seriously limited in memory, It had only 20 accumulators which stored 10 digit numbers. The  memory could not be scaled easily because each accumulator was a set of 36 power hungry vacuum tubes.</div>
+    <p class="lead step">Memory was not easy to scale because each accumulator used 36 vacuum tubes and these were very power hungry.</p>
+    <p class="lead step"><em>There was need for a cheaper way to store working memory.</em></p>
+  </div>
+</section>
+
+<section class="slide l-split bigtext" data-title="Acoustic waves hold information" data-chapter="Scene III · Addressing the ENIAC's Memory Problem" style="--split: 1fr 1.15fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The solution · Mercury delay lines</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Mercury Delay lines were found as a cheaper more practical and efficient alternative to accumulators. They were used to expand the working memory at a large scale.</p>
+      
+    </div>
+    <figure data-id="m03-mercury-delay-line-system" class="pic mount diagram" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Diagram" data-label="An acoustic delay line memory system.">
+      <img src="img/m03-mercury-delay-line-system.jpg" alt="Block diagram of an acoustic delay line memory: the mercury delay line, a detecting amplifier, pulse shaping circuit and transducer driver in a loop">
+      <figcaption><span class="figno">Fig. 7</span>An acoustic delay line memory system.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-split flip bigtext" data-title="Piezoelectric crystals" data-chapter="Scene III · Addressing the ENIAC's Memory Problem" style="--split: 1fr 1.15fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">Why sound?</p>
+      <p class="say" data-anim="rise" style="--d:.3s">Sound was way slower than electromagnetic waves and hence a greater delay could be achieved with a shorter length tube.</p>
+      <p class="lead step">Piezoelectric crystals were used to convert between acoustic waves and electricity.</p>
+    </div>
+    <figure data-id="m03-mercury-tube-crystals" class="pic mount diagram" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Diagram" data-label="A mercury-filled tube with an input and an output crystal.">
+      <img src="img/m03-mercury-tube-crystals.jpg" alt="A metal tube filled with mercury, with an input crystal at one end and an output crystal at the other, and pulses travelling between them">
+      <figcaption><span class="figno">Fig. 8</span>A mercury-filled tube with an input and an output crystal.</figcaption>
+    </figure>
+  </div>
+</section>
+
+
+<!-- ================================================================
+     SCENE IV · ADDRESSING THE REPROGRAMMING PROBLEM (problem, then solution)
+     ================================================================ -->
+
+<section class="slide l-chapter dark no-runner" data-title="Scene IV: Addressing the ENIAC's Reprogramming Problem" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Scene IV</div>
+    <h2 data-anim="ink" style="--d:1s">Addressing the ENIAC's Reprogramming Problem</h2>
+  </div>
+</section>
+
+<section class="slide l-split flip bigtext" data-title="Rewired by hand" data-chapter="Scene IV · Addressing the ENIAC's Reprogramming Problem" style="--split: 1.15fr 1fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">Problem II · Reprogramming</p>
+      <p class="say" data-anim="rise" style="--d:.3s">The ENIAC did not have any notion of a stored program.</p>
+      <p class="lead step">It needed humans to rewire it physically to implement different programs on it.</p>
+    </div>
+    <figure data-id="m02-eniac-women-programmers" class="pic mount" data-anim="fade" style="--d:.3s; --fit:contain" data-kind="Photograph" data-label="Two of the six women who programmed ENIAC, at its cable panels.">
+      <img src="img/m02-eniac-women-programmers.gif" alt="Two of the women who programmed ENIAC, working at its cable panels">
+      <figcaption><span class="figno">Fig. 9</span>Two of the six women who programmed ENIAC, at its cable panels.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext dense" data-title="The stored program" data-chapter="Scene IV · Addressing the ENIAC's Reprogramming Problem">
+  <div class="content">
+    <p class="say" data-anim="ink" style="--d:.3s">This cable work, was tiresome, and recognized as a bottleneck that had to be resolved.</p>
+    <hr class="sep step">
+    <p class="kicker step">The solution</p>
+    <p class="lead step">The stored-program computer: keep the program in memory, alongside the data. This ame up in later programs. We delve no further, since this is the outside the scope of the project.</p>
+    
+  </div>
+  <aside class="notes"><p>The idea grew out of the ENIAC team itself, from Eckert and Mauchly's work, and was written up by John von Neumann in 1945.</p></aside>
+</section>
+
+
+
+<!-- ================================================================
+     SCENE V · ADDRESSING THE DEBUGGING PROBLEM (problem, then solution)
+     ================================================================ -->
+
+<section class="slide l-chapter dark no-runner" data-title="Scene V: Addressing the ENIAC's Debugging Problem" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Scene V</div>
+    <h2 data-anim="ink" style="--d:1s">Addressing the ENIAC's Debugging Problem</h2>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext bulbs dense" data-title="Bulbs on each accumulator" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Problem III · Debugging</p>
+    <p class="lead" data-anim="rise" style="--d:.2s"><em>Debugging ENIAC was hard and required a lot of man hours.</em></p>
+    <svg class="ring" viewBox="60 100 1000 180" data-anim="draw" style="--d:.3s" role="img" aria-label="A ring of ten lamps for one decimal digit, with the lamp for 6 lit">
+        <path class="ink" pathLength="1" d="M60 120 H1120" style="stroke-width:1.2; opacity:.5"/>
+        <circle cx="110" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="110" y="260" text-anchor="middle" style="">0</text>
+        <circle cx="210" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="210" y="260" text-anchor="middle" style="">1</text>
+        <circle cx="310" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="310" y="260" text-anchor="middle" style="">2</text>
+        <circle cx="410" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="410" y="260" text-anchor="middle" style="">3</text>
+        <circle cx="510" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="510" y="260" text-anchor="middle" style="">4</text>
+        <circle cx="610" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="610" y="260" text-anchor="middle" style="">5</text>
+        <circle cx="710" cy="180" r="34" style="fill:var(--orange);stroke:var(--orange);stroke-width:2.5"/><text class="txt" x="710" y="260" text-anchor="middle" style="fill:var(--orange)">6</text>
+        <circle cx="810" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="810" y="260" text-anchor="middle" style="">7</text>
+        <circle cx="910" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="910" y="260" text-anchor="middle" style="">8</text>
+        <circle cx="1010" cy="180" r="34" style="fill:none;stroke:var(--ink-faint);stroke-width:2.5"/><text class="txt" x="1010" y="260" text-anchor="middle" style="">9</text>
+      </svg>
+    <p class="say" data-anim="ink" style="--d:.6s">Each accumulator had a series of bulbs connected to it signalling the value stored by it.</p>
+    <p class="lead" data-anim="rise" style="--d:1.4s">This was logged by humans and then used to debug the program/ find a faulty accumulator.</p>
+  </div>
+  <aside class="notes"><p>Every decimal digit was a ring of ten lamps with exactly one lit. Operators wrote the values down and compared them with what the program should have produced.</p></aside>
+</section>
+
+<section class="slide l-statement bigtext" data-title="Watching bulbs was tiresome" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">The debugging problem</p>
+    <p class="say" data-anim="ink" style="--d:.3s">Watching bulbs and noting down values was tiresome, needed more labour and an overkill for most simple debugging cases</p>
+    <p class="lead" data-anim="rise" style="--d:1s">Like finding out if the program has halted, entered an infinite loop, is stalling, etc.</p>
+  </div>
+</section>
+
+<section class="slide l-split bigtext" data-title="Hooters" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem" style="--split: 1.1fr 1fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The solution</p>
+      <p class="say" data-anim="ink" style="--d:.3s">This problem was solved by introducing hooters.</p>
+    </div>
+    <figure data-id="m04-electronic-hooter" class="pic mount" data-anim="fade" style="--d:.3s" data-kind="Photograph" data-label="An electronic hooter">
+      <img src="img/m04-electronic-hooter.webp" alt="A panel-mounted electronic hooter: a square box with a round speaker grille, two indicator lamps and an Accept button">
+      <figcaption><span class="figno">Fig. 10</span>An electronic hooter (a modern panel-mounted example).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide l-plate bigtext" data-title="Electricity to sound" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="plate" data-anim="fade" style="--d:.1s">
+      <div class="plate-head"><span>Plate II</span><span class="t">The Hooter</span><span>Fig. 11</span></div>
+      <svg viewBox="0 0 1180 360" data-anim="draw" style="--d:.3s" role="img" aria-label="A switching voltage on a wire drives the coil of a loudspeaker, which moves a diaphragm and produces sound waves">
+        <defs><marker id="ah4" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+        <text class="head" x="80" y="90">VOLTAGE ON A WIRE</text>
+        <path class="wave" pathLength="1" d="M80 230 V130 H140 V230 H200 V130 H260 V230 H320 V130 H380 V230 H440"/>
+        <path class="ink" pathLength="1" d="M470 180 H560" marker-end="url(#ah4)"/>
+        <rect class="ink" pathLength="1" x="580" y="132.75" width="45.900000000000006" height="94.5"/><path class="ink" pathLength="1" d="M625.9 132.75 L728.5 51.75 L728.5 308.25 L625.9 227.25 Z"/><path class="wave" pathLength="1" d="M755.5 126.0 Q779.8 180 755.5 234.0"/><path class="wave" pathLength="1" d="M806.8 85.5 Q849.3249999999999 180 806.8 274.5"/><path class="wave" pathLength="1" d="M858.1 45.0 Q918.85 180 858.1 315.0"/>
+        <text class="cap" x="618" y="345" text-anchor="end">COIL</text>
+        <text class="cap" x="650" y="345" text-anchor="start">DIAPHRAGM</text>
+        <text class="head" x="960" y="190">SOUND</text>
+      </svg>
+      <p class="plate-legend" data-anim="fade" style="--d:1.8s">These were electricity to sound transducers.</p>
+      <p class="plate-legend step">They were of two kinds: <span style="color:var(--blue)">Passive Sonification</span> and <span style="color:var(--orange)">Active Audio</span>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide l-plate bigtext" data-title="Passive sonification" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="plate" data-anim="fade" style="--d:.1s">
+      <div class="plate-head"><span>Plate III</span><span class="t">Passive Sonification</span><span>Fig. 12</span></div>
+      <svg viewBox="0 0 1180 380" data-anim="draw" style="--d:.3s" role="img" aria-label="A sensor clipped onto a wire inside the computer picks up its voltage switching and drives a loudspeaker">
+        <defs><marker id="ah4" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+        <text class="head" x="80" y="40">A WIRE INSIDE THE MACHINE</text>
+        <path class="wave" pathLength="1" d="M80 130 V70 H120 V130 H160 V70 H185 V130 H210 V70 H270 V130 H290 V70 H310 V130 H330 V70 H380 V130 H420 V70 H450 V130 H480 V70 H550 V130 H590 V70 H630 V130 H655 V70 H680 V130 H720 V70 H750 V130 H780 V70 H840 V130 H880 V70 H920"/>
+        <path class="ink" pathLength="1" d="M80 150 H920" style="opacity:.5"/>
+        <path class="ink" pathLength="1" d="M420 150 V200"/>
+        <rect class="ink" pathLength="1" x="330" y="200" width="180" height="70"/>
+        <text class="cap" x="420" y="242" text-anchor="middle">SENSOR</text>
+        <path class="ink" pathLength="1" d="M510 235 H600" marker-end="url(#ah4)"/>
+        <rect class="ink" pathLength="1" x="620" y="236.75" width="32.3" height="66.5"/><path class="ink" pathLength="1" d="M652.3 236.75 L724.5 179.75 L724.5 360.25 L652.3 303.25 Z"/><path class="wave" pathLength="1" d="M743.5 232.0 Q760.6 270 743.5 308.0"/><path class="wave" pathLength="1" d="M779.6 203.5 Q809.525 270 779.6 336.5"/><path class="wave" pathLength="1" d="M815.7 175.0 Q858.45 270 815.7 365.0"/>
+        <text class="head" x="900" y="250">RATE OF CHANGE</text>
+        <text class="head" x="900" y="290">→ PITCH</text>
+      </svg>
+      <p class="plate-legend" data-anim="fade" style="--d:1.8s">Passive sonification referred to hardware eavesdropping by connecting small electrical components on a wire that sensed voltage switches and converted the rate of voltage change to sound.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide l-live" data-title="Demo: passive sonification" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="live-head" style="--c:var(--blue)">
+      <p class="kicker">Live demonstration · Passive sonification</p>
+      <p class="say">The speaker eavesdrops on a register.</p>
+      <p class="try">Press Run. Counting up flips bit 0 on every pass, so the arithmetic itself makes the tone.</p>
+    </div>
+    <div class="screen"><iframe data-src="demos/transducer_simulator.html?preset=asm:3" title="The speaker eavesdrops on a register." allow="autoplay"></iframe></div>
+  </div>
+  <aside class="notes"><p>No instruction asks for sound here: the speaker is wired to bit 0 of register A, so whatever the machine computes is heard. Switch 'Speaker wired to' back to the HOOT instruction and the counting goes silent.</p></aside>
+</section>
+
+<section class="slide l-plate bigtext" data-title="Active audio" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="plate" data-anim="fade" style="--d:.1s">
+      <div class="plate-head"><span>Plate IV</span><span class="t">Active Audio</span><span>Fig. 13</span></div>
+      <svg viewBox="0 0 1180 360" data-anim="draw" style="--d:.3s" role="img" aria-label="A program listing with a special HOOT instruction that sends a pulse to the loudspeaker each time it runs">
+        <defs><marker id="ah4" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+        <text class="head" x="90" y="40">THE PROGRAM</text>
+        <rect class="ink" pathLength="1" x="60" y="60" width="440" height="270" style="opacity:.6"/>
+        <text class="txt" x="90" y="95" style="font-family:var(--f-type);font-size:30px;fill:var(--ink-faint)">loop:</text><text class="txt" x="220" y="95" style="font-family:var(--f-type);font-size:30px;">ADD  A, B</text><text class="txt" x="90" y="147" style="font-family:var(--f-type);font-size:30px;fill:var(--ink-faint)"></text><text class="txt" x="220" y="147" style="font-family:var(--f-type);font-size:30px;">SUB  C, 1</text><text class="txt" x="90" y="199" style="font-family:var(--f-type);font-size:30px;fill:var(--ink-faint)"></text><text class="txt" x="220" y="199" style="font-family:var(--f-type);font-size:30px;fill:var(--orange)">HOOT</text><text class="txt" x="90" y="251" style="font-family:var(--f-type);font-size:30px;fill:var(--ink-faint)"></text><text class="txt" x="220" y="251" style="font-family:var(--f-type);font-size:30px;">JNZ  C, loop</text><text class="txt" x="90" y="303" style="font-family:var(--f-type);font-size:30px;fill:var(--ink-faint)"></text><text class="txt" x="220" y="303" style="font-family:var(--f-type);font-size:30px;">HALT</text>
+        <path class="ink" d="M330 190 H500" style="stroke-dasharray:6 8;stroke-dashoffset:0;opacity:.5"/><path class="ink" pathLength="1" d="M500 190 H605" marker-end="url(#ah4)"/>
+        <text class="cap" x="552" y="172" text-anchor="middle">PULSE</text>
+        <rect class="ink" pathLength="1" x="630" y="153.25" width="35.7" height="73.5"/><path class="ink" pathLength="1" d="M665.7 153.25 L745.5 90.25 L745.5 289.75 L665.7 226.75 Z"/><path class="wave" pathLength="1" d="M766.5 148.0 Q785.4 190 766.5 232.0"/><path class="wave" pathLength="1" d="M806.4 116.5 Q839.475 190 806.4 263.5"/><path class="wave" pathLength="1" d="M846.3 85.0 Q893.55 190 846.3 295.0"/>
+        <text class="head" x="930" y="170">HOW OFTEN</text>
+        <text class="head" x="930" y="210">→ PITCH</text>
+      </svg>
+      <p class="plate-legend" data-anim="fade" style="--d:1.8s">Active audio referred to having special instructions which specifically signalled the transducer. The frequency of these signals was converted to sound of different pitches.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide l-live" data-title="Demo: active audio" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="live-head" style="--c:var(--orange)">
+      <p class="kicker">Live demonstration · Active audio</p>
+      <p class="say">The program calls the speaker.</p>
+      <p class="try">Press Run. One HOOT per trip round the loop gives a steady tone. Try Slow motion to see each pulse.</p>
+    </div>
+    <div class="screen"><iframe data-src="demos/transducer_simulator.html?preset=asm:0&amp;only=code" title="The program calls the speaker." allow="autoplay"></iframe></div>
+  </div>
+  <aside class="notes"><p>A special HOOT instruction pulses the speaker each time it runs, so the length of the loop sets the pitch. Choose Slow motion under Machine speed to watch the highlighted line step and hear each click.</p></aside>
+</section>
+
+<section class="slide l-statement bigtext" data-title="Walk into the room" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="say" data-anim="ink" style="--d:.3s">Now a person could just walk into the room and identify the stage of progress made by the program.</p>
+    <p class="lead step">Debugging was also possible and reduced the amount of labour needed immensely.</p>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext" data-title="Sound becomes music" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="say" data-anim="ink" style="--d:.3s">This relation between computers and sound has so far only been a one way street, but the next steps in technology change this dynamic.</p>
+    <p class="lead" data-anim="rise" style="--d:1s">Sound becomes Music.</p>
+  </div>
+</section>
+
+<section class="slide l-statement bigtext" data-title="Elementary observations" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Elementary observations</p>
+    <ol class="obs">
+      <li class="step">Like we saw, hooters work by receiving signals from specially designed instructions.</li>
+      <li class="step">Precisely controlling the intervals between successive clicks can control the perceived pitch.</li>
+    </ol>
+  </div>
+  <aside class="notes"><p>Press → to bring in each observation.</p></aside>
+</section>
+
+<section class="slide l-compare2 bigtext" data-title="Clicks versus smooth sound" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Elementary observations · 3</p>
+    <p class="say" data-anim="ink" style="--d:.2s">However a 1-bit speaker was too rudimentary to be able to create good music. It lacked the ability to create smooth sound waves.</p>
+    <div class="pair">
+      <figure data-id="m04-spectrogram-table" class="pic plain" data-anim="slide-l" style="--d:.7s; --fit:contain; --c:var(--orange)" data-kind="Spectrogram" data-label="Banging a table">
+        <img src="img/m04-spectrogram-table.png" alt="Spectrogram of banging a table: a row of separate vertical clicks">
+        <figcaption><span class="figno">Fig. 14</span>Banging a table: separate clicks, like a 1-bit speaker.</figcaption>
+      </figure>
+      <figure data-id="m04-spectrogram-singing" class="pic plain" data-anim="slide-r" style="--d:1s; --fit:contain; --c:var(--green)" data-kind="Spectrogram" data-label="Singing sa re ga ma">
+        <img src="img/m04-spectrogram-singing.png" alt="Spectrogram of singing sa re ga ma: smooth horizontal bands of harmonics">
+        <figcaption><span class="figno">Fig. 15</span>Singing sa re ga ma: smooth, continuous tones.</figcaption>
+      </figure>
+    </div>
+  </div>
+  <aside class="notes"><p>Both are spectrograms: time runs left to right, pitch goes up. The table gives isolated vertical clicks; the voice gives steady horizontal bands, a fundamental with its harmonics stacked above it. A speaker that can only click on and off sits on the left; music needs the right.</p></aside>
+</section>
+
+<section class="slide l-statement bigtext dense" data-title="Computer music" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <p class="kicker" data-anim="fade">A new field</p>
+    <p class="say" data-anim="ink" style="--d:.3s">The field that worked on this problem was called “Computer Music” and “Digital Sound Synthesis”.</p>
+    <p class="lead" data-anim="rise" style="--d:1s">It falls into the realm of what is today called “Digital Signal Processing”.</p>
+    <p class="lead step"><em>Several audios of digitally created music have been filmed as the field progressed.</em></p>
+  </div>
+</section>
+
+<section class="slide l-bench" data-title="Demonstrations" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem">
+  <div class="content">
+    <div class="bench-head">
+      <p class="kicker">Demonstrations · the listening bench</p>
+      <p class="say">Listening to a program.</p>
+    </div>
+    <div class="bench">
+      <nav class="rail" aria-label="Experiments">
+        <button class="exp on" data-preset="asm:4" data-try="Press Run. It should stop after five pulses but hums forever. Add DEC A before the JNZ and it falls silent." style="--c:var(--green)">
+          <span class="n">I</span>
+          <span class="t">Debugging by ear</span>
+          <span class="d">A loop that never ends: you hear the hum.</span>
+        </button>
+        <button class="exp" data-preset="asm:3" data-try="Press Run. No instruction asks for sound: the counting itself is heard." style="--c:var(--blue)">
+          <span class="n">II</span>
+          <span class="t">Passive sonification</span>
+          <span class="d">The speaker eavesdrops on bit 0 of a register.</span>
+        </button>
+        <button class="exp" data-preset="asm:0" data-try="Press Run. One HOOT per trip round the loop gives a steady tone. Try Slow motion." style="--c:var(--orange)">
+          <span class="n">III</span>
+          <span class="t">Active audio</span>
+          <span class="d">A HOOT instruction pulses the speaker.</span>
+        </button>
+        <button class="exp" data-preset="asm:2" data-try="Press Run. The tone tells you which branch the program is in." style="--c:var(--pink)">
+          <span class="n">IV</span>
+          <span class="t">Which branch is running?</span>
+          <span class="d">Two loops, two pitches.</span>
+        </button>
+        <button class="exp" data-preset="blk:4" data-try="Press Run. The same trick, with loop lengths chosen to make notes." style="--c:var(--brass, #c4a265)">
+          <span class="n">V</span>
+          <span class="t">From signal to song</span>
+          <span class="d">God Save the King, as on the Ferranti Mark 1 (1951).</span>
+        </button>
+        <p class="try">Press Run. It should stop after five pulses but hums forever. Add DEC A before the JNZ and it falls silent.</p>
+      </nav>
+      <div class="screen"><iframe data-src="demos/transducer_simulator.html?preset=asm:4" title="Listening to a Program: live simulator" allow="autoplay"></iframe></div>
+    </div>
+  </div>
+  <aside class="notes"><p>Click an experiment on the left to load it into the simulator, then press Run. Debugging by ear is the one to show first: a stuck loop is heard as a hum that never stops. Passive and active audio repeat the two kinds of hooter; the last one shows the same trick turned into music, leading to the next scene.</p></aside>
+</section>
+
+<section class="slide l-record" data-title="CSIRAC, Sydney, 1951" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem" style="--c:var(--blue)">
+  <div class="content">
+    <div class="rec-left">
+      <figure data-id="m04-csirac" class="pic mount" data-anim="fade" style="--d:.2s; --fy:50%" data-kind="Photograph" data-label="CSIRAC, Australia's first computer.">
+        <img src="img/m04-csirac.jpg" alt="CSIRAC's console, tape reader and panels of valves, now at Museums Victoria">
+        <figcaption><span class="figno">Fig. 16</span>CSIRAC, Australia's first computer.</figcaption>
+      </figure>
+      <div class="player" data-anim="rise" style="--d:.6s">
+        <audio preload="metadata" src="audio/m04-csirac-1951.m4a"></audio>
+        <button class="pl-btn" aria-label="Play recording"><span class="pl-icon"></span></button>
+        <div class="pl-body">
+          <div class="pl-title">Listen: CSIRAC</div>
+          <div class="pl-bar"><span class="pl-fill"></span></div>
+        </div>
+        <div class="pl-time">0:00 / 0:39</div>
+      </div>
+    </div>
+    <div class="rec-right">
+      <p class="kicker" data-anim="fade">Sydney, Australia · Mid-1951</p>
+      <p class="say" data-anim="ink" style="--d:.2s">CSIRAC</p>
+      <dl class="facts-list" data-anim="rise" style="--d:.5s">
+        <dt>Played</dt><dd>“Colonel Bogey March”, “In Cellar Cool”</dd>
+        <dt>Programmed by</dt><dd>Geoff Hill, Trevor Pearcey</dd>
+      </dl>
+      <div class="tech" data-anim="rise" style="--d:.8s">
+        <div class="tech-label">Technology</div>
+        <div class="tech-title">1-bit delay-line pulse audio</div>
+        <p>Data was arranged inside mercury acoustic delay-line memory so that cyclic bit readouts pulsed the diagnostic speaker coil at audible frequencies.</p>
+        <div class="tech-link">Built on the mercury delay lines of Scene III.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p>Press play on the recording. CSIRAC played popular tunes in 1951; no recording was made at the time, so the CSIRAC music heard today is a later reconstruction from the original programs. The sound came straight out of the mercury delay-line memory (explained in Scene III).</p></aside>
+</section>
+
+<section class="slide l-record" data-title="Ferranti Mark 1, Manchester, 1951" data-chapter="Scene V · Addressing the ENIAC's Debugging Problem" style="--c:var(--orange)">
+  <div class="content">
+    <div class="rec-left">
+      <figure data-id="m04-ferranti-mark1" class="pic mount" data-anim="fade" style="--d:.2s; --fy:50%" data-kind="Photograph" data-label="The Ferranti Mark 1, Manchester.">
+        <img src="img/m04-ferranti-mark1.gif" alt="Operators at the Ferranti Mark 1 console in Manchester">
+        <figcaption><span class="figno">Fig. 17</span>The Ferranti Mark 1, Manchester.</figcaption>
+      </figure>
+      <div class="player" data-anim="rise" style="--d:.6s">
+        <audio preload="metadata" src="audio/m04-ferranti-mark1-1951.m4a"></audio>
+        <button class="pl-btn" aria-label="Play recording"><span class="pl-icon"></span></button>
+        <div class="pl-body">
+          <div class="pl-title">Listen: the BBC recording, 1951</div>
+          <div class="pl-bar"><span class="pl-fill"></span></div>
+        </div>
+        <div class="pl-time">0:00 / 1:45</div>
+      </div>
+    </div>
+    <div class="rec-right">
+      <p class="kicker" data-anim="fade">Manchester, UK · Autumn 1951</p>
+      <p class="say" data-anim="ink" style="--d:.2s">Ferranti Mark 1</p>
+      <dl class="facts-list" data-anim="rise" style="--d:.5s">
+        <dt>Played</dt><dd>“God Save the King”, “Baa, Baa, Black Sheep”, “In the Mood”</dd>
+        <dt>Programmed by</dt><dd>Christopher Strachey</dd>
+      </dl>
+      <div class="tech" data-anim="rise" style="--d:.8s">
+        <div class="tech-label">Technology</div>
+        <div class="tech-title">1-bit programmed opcode</div>
+        <p>Strachey used the machine's dedicated single-pulse <code>hooter</code> instruction inside cycle-counted CPU delay loops, recorded on-site by a BBC mobile broadcast unit.</p>
+        <div class="tech-link">Active audio, exactly as on the demonstration bench.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p>Press play: about 1 minute 45 seconds. This is the oldest surviving recording of computer-generated music. Each note is a loop around the hooter instruction, the same active audio as on the demonstration bench.</p></aside>
+</section>
+
+
+<section class="slide l-record" data-title="The Silver Scale, 1957" data-chapter="Scene VI · Electrical Musical Compositions" style="--c:var(--green)">
+  <div class="content">
+    <div class="rec-left">
+      <div class="video" data-youtube="PM64-lqYyZ8" data-anim="fade" style="--d:.2s">
+        <button class="video-poster" aria-label="Play The Silver Scale (YouTube)">
+          <span class="vp-kicker">Newman Guttman · 1957</span>
+          <span class="vp-title">The Silver Scale</span>
+          <svg viewBox="0 0 800 150" aria-hidden="true"><path d="M20 72 H39 V84 H58 V96 H77 V108 H96 V120 H115 V120 H134 V120 H153 V108 H172 V108 H191 V96 H210 V72 H229 V60 H248 V48 H267 V24 H286 V24 H305 V12 H324 V24 H343 V24 H362 V36 H381 V60 H400 V72 H419 V96 H438 V108 H457 V120 H476 V132 H495 V132 H514 V132 H533 V120 H552 V108 H571 V96 H590 V72 H609 V60 H628 V48 H647 V36 H666 V36 H685 V36 H704 V36 H723 V48 H742 V48 H761 V60 H780 V72" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+          <span class="vp-play"><span class="pl-icon"></span></span>
+        </button>
+      </div>
+      <p class="video-cap">Plays from YouTube. <a href="https://youtu.be/PM64-lqYyZ8" target="_blank" rel="noopener">Open on YouTube ↗</a></p>
+    </div>
+    <div class="rec-right">
+      <p class="kicker" data-anim="fade">Bell Labs, New Jersey · 1957</p>
+      <p class="say" data-anim="ink" style="--d:.2s">The Silver Scale</p>
+      <dl class="facts-list" data-anim="rise" style="--d:.5s">
+        <dt>Composed by</dt><dd>Newman Guttman</dd>
+        <dt>Program</dt><dd>MUSIC I, by Max Mathews, on an IBM 704</dd>
+      </dl>
+      <div class="tech" data-anim="rise" style="--d:.8s">
+        <div class="tech-label">Technology</div>
+        <div class="tech-title">Digital sound synthesis</div>
+        <p>The computer calculated every sample of the sound wave as a number. The numbers were written to tape, and a digital-to-analog converter turned them back into sound.</p>
+        <div class="tech-link">The first truly digitally synthesized music: not a speaker switched on and off, but the waveform itself computed.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p>Click the poster to play (about 17 seconds). If the video will not play when the deck is opened from a file, use "Open on YouTube". Contrast with 1951: CSIRAC and the Ferranti Mark 1 could only switch a speaker on and off; MUSIC I computed the shape of the wave itself.</p></aside>
+</section>
+
+<!-- SYNOPSIS · LATER DEVELOPMENTS (replaces the Zooming Out interlude) -->
+
+<section class="slide l-summary bigtext synopsis" data-title="Later developments" data-chapter="Scene VI · Electrical Musical Compositions">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Zooming out · later developments</p>
+    <p class="say" data-anim="ink" style="--d:.3s">From computing sound to capturing it</p>
+    <div class="flaws">
+      <div class="flaw step" style="--c:var(--orange)">
+        <span class="no">1948</span>
+        <h3>Analog sampling</h3>
+        <p>Real sounds recorded on disc and tape, then cut, looped and replayed as an instrument, years before computers made music.</p>
+      </div>
+      <div class="flaw step" style="--c:var(--green)">
+        <span class="no">1957</span>
+        <h3>Digital synthesis</h3>
+        <p>The computer calculates the waveform sample by sample; a DAC turns the numbers into sound.</p>
+      </div>
+      <div class="flaw step" style="--c:var(--blue)">
+        <span class="no">1969–1979</span>
+        <h3>Digital sampling</h3>
+        <p>An ADC and fast memory let the computer record real sound and play it back from a keyboard.</p>
+      </div>
+    </div>
+    <p class="synopsis-foot step">Together these grew into digital signal processing: the basis of every music app today.</p>
+  </div>
+  <aside class="notes"><p>One-slide summary of what came later. The surprise is the order: computers could make sound from numbers (through a DAC) more than a decade before they could record real sound (which needed a fast ADC and memory). Press → to bring in each stage and the closing line.</p></aside>
+</section>
+
+<!-- THANK YOU · the letters march in to the Ferranti Mark 1 playing God Save the King (1951) -->
+<section class="slide l-thanks no-runner" data-title="Thank you">
+  <audio class="slide-sound" src="audio/m04-ferranti-mark1-1951.m4a" data-start="1.3" data-end="15.3" preload="auto"></audio>
+  <div class="content">
+    <p class="kicker" data-anim="fade" style="--d:.4s">ARIGATTO</p>
+    <div class="march" role="img" aria-label="Thank you"><span class="m" style="--i:0; --c:var(--pink)"><span>T</span></span><span class="m" style="--i:1; --c:var(--orange)"><span>h</span></span><span class="m" style="--i:2; --c:var(--green)"><span>a</span></span><span class="m" style="--i:3; --c:var(--blue)"><span>n</span></span><span class="m" style="--i:4; --c:var(--offwhite)"><span>k</span></span><span class="m gap" style="--i:5"></span><span class="m" style="--i:6; --c:var(--pink)"><span>y</span></span><span class="m" style="--i:7; --c:var(--orange)"><span>o</span></span><span class="m" style="--i:8; --c:var(--green)"><span>u</span></span></div>
+    <p class="march-cap" data-anim="fade" style="--d:5.5s">♪ God Save the King · played by the Ferranti Mark 1, Manchester, 1951</p>
+  </div>
+  <aside class="notes"><p>The music is the opening of the 1951 BBC recording of the Ferranti Mark 1: the same 1-bit hooter we met in Scene V. Press M to stop or restart it.</p></aside>
+</section>
+
+</div>
+<script src="deck.js"></script>
+</body>
+</html>

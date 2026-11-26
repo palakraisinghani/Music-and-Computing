@@ -1,0 +1,113 @@
+/* =====================================================================
+   demo-theme.css: restyles the interactive demonstrations
+   (transducer_simulator.html, sargam_lab.html, groove_lab.html)
+   to match the slides: near-black ground, white / off-white text,
+   pink · orange · green · blue accents, antique brass, and the deck's
+   three typefaces. Linked from each demo after its own <style>, so it
+   overrides the original light-paper colours without editing them.
+   ===================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap");
+
+:root {
+  --bg: #08080a; --panel: #121215; --card: #17171b; --ink: #f3efe6; --muted: #9b978f;
+  --line: rgba(255, 255, 255, .14); --accent: #c4a265; --red: #f497b6; --amber: #f5a65b;
+  --offwhite: #ece8df; --pink: #f497b6; --orange: #f5a65b; --green: #8ed6a4; --blue: #86b8f7; --brass: #c4a265;
+  --on-accent: #120d06;
+  --f-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --f-body: "EB Garamond", "Iowan Old Style", Georgia, serif;
+  --f-type: "Special Elite", "American Typewriter", "Courier New", monospace;
+  color-scheme: dark;
+}
+
+body {
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, .04), transparent 60%), var(--bg);
+  color: var(--ink);
+  font: 17px/1.5 var(--f-body);
+}
+select, button, input, textarea { font-family: var(--f-body); font-size: 15px; color: var(--ink); }
+select, input[type=number], input[type=text], textarea { background: var(--card); color: var(--ink); border-color: var(--line); }
+input[type=range], input[type=checkbox] { accent-color: var(--brass); }
+
+button { background: transparent; color: var(--ink); border-color: rgba(196, 162, 101, .45); }
+button:hover:not(:disabled) { border-color: var(--brass); background: rgba(196, 162, 101, .1); }
+button.primary, .tab.on, .tools .grp button.on, #selbar button.on, .modes button.on {
+  background: var(--brass); border-color: var(--brass); color: var(--on-accent);
+}
+
+/* ---------- headings and running text ---------- */
+h1, .top h1 { font: 400 32px/1.15 var(--f-display); color: var(--ink); letter-spacing: .005em; }
+.sub, .lede, .desc { color: var(--offwhite); font-family: var(--f-body); }
+.lede, .desc { font-size: 18px; }
+.sub { font-style: italic; }
+section > h2 { font: 400 30px var(--f-display); letter-spacing: 0; color: var(--ink); border-top-color: var(--line); }
+section > h2 .n { color: var(--orange); }
+.card h3 { font: 400 21px var(--f-display); }
+#now, #out, #pitch { font-family: var(--f-body); color: var(--ink); }
+#pitch { font-size: 20px; }
+#clock { color: var(--orange); }
+
+/* small labels in the deck's typewriter face */
+.controls label.f, .pane > h2, h2, table.loops th, .top label, .padcap, .fnhead .volt, .info, .reg, #status, #rateOut {
+  font-family: var(--f-type); letter-spacing: .12em;
+}
+.controls label.f, .pane > h2, h2, table.loops th { color: var(--muted); font-weight: 400; }
+#rateOut, .info, .reg, .volt { letter-spacing: .04em; }
+.note, .hint, .help, .legend, .secsub, .how { color: var(--muted); }
+
+/* ---------- panels ---------- */
+.top { background: rgba(10, 10, 12, .94); border-bottom-color: var(--line); backdrop-filter: blur(4px); }
+.controls, .pane, .box, .card, .fn, .edbox { background: var(--panel); border-color: var(--line); }
+#editor { background: var(--card); color: var(--ink); }
+.help code, details.ref code { background: var(--card); color: var(--ink); }
+#err, #typeErr { color: var(--pink); }
+.emptymsg, .edbox .empty { color: var(--muted); font-family: var(--f-body); }
+#status b, .pass, .rephead .pass { color: var(--pink); }
+
+/* ---------- Listening to a Program (transducer_simulator.html) ---------- */
+#listing { color: var(--offwhite); }
+.ln .no { color: #5f5b55; }
+.ln .cm { color: #8a8680; }
+.ln.cur { background: rgba(245, 166, 91, .92) !important; color: var(--on-accent); border-left-color: var(--orange); }
+.ln.cur .no, .ln.cur .cm { color: rgba(18, 13, 6, .7); }
+.blk { background: var(--card); border-color: var(--line); border-left-color: var(--brass); }
+.blk-rest { border-left-color: #5f5b55; }
+.blk-drum { border-left-color: var(--blue); }
+.blk-repeat, .blk-forever { border-left-color: var(--green); background: #131316; }
+.blk-halt { border-left-color: var(--pink); }
+.blk.playing > .bh { background: rgba(245, 166, 91, .92); color: var(--on-accent); }
+.blk.playing > .bh .info, .blk.playing > .bh .bctl button { color: rgba(18, 13, 6, .75); }
+.blk.inside { border-color: rgba(245, 166, 91, .55); }
+.bctl button { background: transparent; border-color: transparent; color: var(--muted); }
+.reg { background: var(--bg); color: var(--offwhite); border-color: var(--line); }
+
+/* ---------- Sargam Lab (sargam_lab.html) ---------- */
+#cone { border-color: var(--muted); }
+#cone.on { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 10px var(--orange); }
+.chip { background: var(--card); border-color: var(--line); color: var(--ink); }
+.chip.playing { background: var(--orange); border-color: var(--orange); color: var(--on-accent); }
+.chip.playing .bt, .chip.playing .sw { color: var(--on-accent); }
+.rep { border-color: var(--brass); background: #131316; }
+.rephead { color: var(--brass); border-right-color: rgba(196, 162, 101, .5); }
+.rep.into { box-shadow: inset 0 0 0 2px rgba(196, 162, 101, .35); }
+.cell { background: var(--card); border-color: var(--line); color: var(--ink); }
+.cell:hover { background: #1f1f24; border-color: var(--brass); }
+.cell.flash { background: var(--orange); border-color: var(--orange); color: var(--on-accent); }
+.cell.flash .d, .cell.flash .d b { color: var(--on-accent); }
+.cents.ok { color: var(--green); } .cents.meh { color: var(--orange); } .cents.bad { color: var(--pink); }
+.sw { font-family: var(--f-body); }
+
+/* ---------- GROOVE Lab (groove_lab.html) ---------- */
+#pad, canvas.f { background: #0f0f12; border-color: var(--line); }
+.fn { background: var(--card); }
+.modes { border-color: var(--line); }
+.modes button { border-right-color: var(--line); }
+
+/* ---------- when shown inside a slide ---------- */
+html.in-deck body { background: var(--bg); }
+html.in-deck .wrap { padding-top: 16px; }
+html.in-deck .wrap > h1, html.in-deck .wrap > .sub { display: none; }
+html.in-deck .wrap { padding: 14px 18px 24px; max-width: none; }
+html.in-deck .split { height: calc(100vh - 168px); min-height: 0; }
+html.in-deck .note { display: none; }
+#pitch small, #now small, #out small { font-family: var(--f-type); letter-spacing: .06em; }

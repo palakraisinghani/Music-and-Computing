@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sargam Lab — swaras as loops</title>
+<style>
+  :root {
+    --bg: #faf8f3; --panel: #f1ede3; --card: #fffdf9; --ink: #2a2520; --muted: #786f60;
+    --line: #e2dcca; --accent: #8a5a2b; --red: #d64537; --amber: #b07a12;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  select, button, input { font: 14px -apple-system, Helvetica, sans-serif; color: var(--ink); }
+  select, input[type=number], input[type=text] { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); }
+  button { padding: 6px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* top bar */
+  .top { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .top .in { max-width: 1240px; margin: 0 auto; padding: 10px 24px; display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+  .top h1 { font: 600 20px "Iowan Old Style", Georgia, serif; margin: 0; }
+  .top label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  #now { flex: 1; min-width: 260px; font-family: "Iowan Old Style", Georgia, serif; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  #now small { font: 12px -apple-system, sans-serif; color: var(--muted); }
+  #cone { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+  #cone.on { background: var(--red); border-color: var(--red); }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 8px 24px 60px; }
+  .lede { color: #4a4336; font-family: "Iowan Old Style", Georgia, serif; font-size: 16px; max-width: 900px; }
+  section > h2 { font: 600 22px "Iowan Old Style", Georgia, serif; margin: 34px 0 4px; padding-top: 14px; border-top: 1px solid var(--line); }
+  section > h2 .n { color: var(--accent); margin-right: 8px; }
+  .secsub { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+
+  /* swara glyph: Bhatkhande-style marks */
+  .sw { position: relative; display: inline-block; padding: 0 1px; font: 600 16px "Iowan Old Style", Georgia, serif; line-height: 1.2; }
+  .sw.k { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }   /* komal */
+  .sw .tv { position: absolute; top: -8px; left: 2px; width: 1.5px; height: 7px; background: currentColor; }   /* tivra */
+  .sw.o1::before, .sw.o2::before, .sw.o-1::after { position: absolute; left: 50%; transform: translateX(-50%); font-size: 10px; line-height: 1; }
+  .sw.o1::before { content: "•"; top: -10px; }
+  .sw.o2::before { content: "••"; top: -10px; letter-spacing: -1px; }
+  .sw.o-1::after { content: "•"; bottom: -11px; }
+
+  /* section 1: compositions */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .card h3 { margin: 0; font: 600 17px "Iowan Old Style", Georgia, serif; }
+  .card .meta { font-size: 13px; color: var(--muted); }
+  .card .acts { display: flex; gap: 8px; margin-top: auto; }
+  .line { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+
+  /* chips (swara blocks) */
+  .chip { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 36px; height: 50px; padding: 0 6px; margin: 2px; border: 1px solid var(--line); border-radius: 5px; background: #fff; cursor: default; user-select: none; }
+  .ed .chip { cursor: pointer; }
+  .chip .bt { font-size: 10px; color: var(--muted); line-height: 1; margin-top: 7px; min-height: 10px; }
+  .chip.rest .sw { font-style: italic; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .chip.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .chip.playing { background: var(--red); border-color: var(--red); color: #fff; }
+  .chip.playing .bt, .chip.playing .sw { color: #fff; }
+  .rep { display: inline-flex; align-items: stretch; margin: 2px; border: 1.5px solid #c9a66b; border-radius: 6px; background: #fbf8f1; max-width: 100%; }
+  .rephead { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px 7px; font-size: 12px; color: var(--accent); border-right: 1px dashed #c9a66b; font-weight: 600; min-width: 44px; }
+  .ed .rephead { cursor: pointer; }
+  .rephead .pass { font-weight: 400; color: var(--red); font-size: 11px; white-space: nowrap; }
+  .repbody { display: flex; flex-wrap: wrap; align-items: center; padding: 1px; min-width: 44px; min-height: 54px; }
+  .rep.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .rep.into { box-shadow: inset 0 0 0 2px rgba(138,90,43,.25); }
+  .rep.inside { border-color: var(--red); }
+
+  /* section 2: palette = loop-size table */
+  .tablewrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+  table.loops { border-collapse: separate; border-spacing: 3px; }
+  table.loops th { font: 600 11px -apple-system, sans-serif; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; text-align: left; padding: 0 6px; white-space: nowrap; }
+  table.loops td { padding: 0; }
+  .cell { width: 74px; padding: 12px 4px 5px; border: 1px solid var(--line); border-radius: 5px; background: #fff; text-align: center; cursor: pointer; display: block; }
+  .cell:hover { border-color: var(--accent); background: #fdf9f0; }
+  .cell.flash { background: var(--red); color: #fff; border-color: var(--red); }
+  .cell.flash .d { color: #fff; }
+  .cell .d { display: block; font: 11px/1.35 -apple-system, sans-serif; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cell .d b { color: var(--ink); font-weight: 600; }
+  .cell.flash .d b { color: #fff; }
+  .cents.ok { color: #4f7a3a; } .cents.meh { color: var(--amber); } .cents.bad { color: var(--red); font-weight: 600; }
+  .legend { font-size: 12px; color: var(--muted); margin: 6px 2px 0; }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 14px 0 8px; }
+  .tools .grp { display: flex; gap: 4px; align-items: center; font-size: 13px; color: var(--muted); }
+  .tools .grp button { padding: 4px 9px; font-size: 13px; }
+  .tools .grp button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  #typeBox { width: 340px; font-family: ui-monospace, Menlo, monospace; }
+  #typeErr { color: #9b2c20; font-size: 13px; }
+  .help { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .help code { font-family: ui-monospace, Menlo, monospace; color: var(--ink); background: var(--panel); padding: 0 3px; border-radius: 3px; }
+
+  .edbox { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 10px; min-height: 110px; }
+  .edbox .empty { color: var(--muted); font-family: Georgia, serif; padding: 18px 8px; }
+  #selbar { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 13px; color: var(--muted); min-height: 36px; margin-bottom: 6px; }
+  #selbar button { padding: 3px 9px; font-size: 13px; }
+  #selbar button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  #selbar input { width: 64px; padding: 3px 6px; }
+
+  @media (max-width: 700px) { .wrap, .top .in { padding-left: 16px; padding-right: 16px; } #typeBox { width: 100%; } .cards { grid-template-columns: 1fr; } }
+</style>
+<link rel="stylesheet" href="slides/demo-theme.css">
+</head>
+<body>
+
+<div class="top"><div class="in">
+  <h1>Sargam Lab</h1>
+  <label>Machine speed
+    <select id="rate">
+      <option value="16000">16,000 instr/s</option>
+      <option value="32000">32,000 instr/s</option>
+      <option value="64000" selected>64,000 instr/s</option>
+    </select>
+  </label>
+  <div id="now"><span id="cone"></span><span id="nowText">— <small>nothing playing</small></span></div>
+  <button id="stopBtn" disabled>■ Stop</button>
+</div></div>
+
+<div class="wrap">
+  <p class="lede">Every swara is a loop. One trip round the loop clicks the speaker once, so a loop of <i>L</i> instructions sounds at <i>speed ÷ L</i> Hz. Sa is set to C4. Each loop length below is the whole number of instructions closest to the true pitch, over three saptaks (C3–C6). A faster machine means longer loops, and longer loops can be tuned more finely.</p>
+
+  <!-- ===================== 1. READY COMPOSITIONS ===================== -->
+  <section>
+    <h2><span class="n">1</span>Ready compositions</h2>
+    <p class="secsub">Raag scales, alankars and a tihai, written in sargam. Press play to hear them as loops, or open one in the editor below to change it.</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <!-- ===================== 2. EDITABLE BLOCKS ===================== -->
+  <section>
+    <h2><span class="n">2</span>Compose with sargam blocks</h2>
+    <p class="secsub">Each cell is a swara block and shows its loop size. Click a cell to add it to your composition. A dot below means mandra, a dot above means taar, an underline means komal, and a bar above Ma means tivra.</p>
+
+    <div class="tablewrap"><table class="loops" id="loopTable"></table></div>
+    <p class="legend" id="legend"></p>
+
+    <div class="tools">
+      <span class="grp">New notes last
+        <button data-unit="0.5">½</button><button data-unit="1" class="on">1</button><button data-unit="2">2</button> beat(s)</span>
+      <span class="grp"><button id="addRest">＿ Rest</button><button id="addRep">⟳ Repeat</button></span>
+      <label class="grp"><input type="checkbox" id="preview" checked> hear notes as I add them</label>
+      <span class="grp">Tempo <input type="number" id="bpm" min="30" max="300" value="100" style="width:70px"> bpm</span>
+      <span class="grp"><button class="primary" id="playMine">▶ Play composition</button><button id="clearMine">Clear</button></span>
+    </div>
+    <div class="tools" style="margin-top:0">
+      <input type="text" id="typeBox" placeholder="or type sargam, e.g.  S R G m P - [ D N S' ]x2" spellcheck="false">
+      <button id="typeAdd">Add</button>
+      <span id="typeErr"></span>
+    </div>
+    <p class="help">Typing: <code>S R G m P D N</code> shuddha · <code>r g d n</code> komal · <code>M</code> tivra Ma · <code>.N</code> mandra · <code>S'</code> taar · <code>S''</code> ati-taar · <code>-</code> hold one more beat · <code>_</code> rest · <code>:2</code> lasts 2 beats · <code>[ … ]x3</code> repeat 3 times (can nest).</p>
+
+    <div id="selbar"></div>
+    <div class="edbox ed" id="editor"></div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+/* =================================================================
+   SARGAM CORE (to be lifted into the main simulator when merging)
+   ================================================================= */
+const SA_MIDI = 60;                              // Sa = C4
+const SW = {                                     // letter -> name, semitones above Sa, komal / tivra
+  S: { n: "Sa", s: 0 },  r: { n: "Re", s: 1, k: 1 }, R: { n: "Re", s: 2 },
+  g: { n: "Ga", s: 3, k: 1 }, G: { n: "Ga", s: 4 },  m: { n: "Ma", s: 5 }, M: { n: "Ma", s: 6, t: 1 },
+  P: { n: "Pa", s: 7 },  d: { n: "Dha", s: 8, k: 1 }, D: { n: "Dha", s: 9 },
+  n: { n: "Ni", s: 10, k: 1 }, N: { n: "Ni", s: 11 },
+};
+const ORDER = "SrRgGmMPdDnN";
+const SAPTAK = { "-1": "mandra", "0": "madhya", "1": "taar", "2": "ati-taar" };
+const WEST = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+let RATE = 64000;
+
+const midiOf = (sw, oct) => SA_MIDI + 12 * oct + SW[sw].s;
+const hzOf = m => 440 * Math.pow(2, (m - 69) / 12);
+const westOf = m => WEST[m % 12] + (Math.floor(m / 12) - 1);
+const loopOf = m => Math.max(6, Math.round(RATE / hzOf(m)));          // the loop size, in instructions
+const centsOf = m => 1200 * Math.log2((RATE / loopOf(m)) / hzOf(m));   // how far the loop is from true pitch
+const swLabel = (sw, oct) => `${SW[sw].n}${SW[sw].k ? " komal" : SW[sw].t ? " tivra" : ""}, ${SAPTAK[oct]}`;
+function glyph(sw, oct) {
+  const d = SW[sw];
+  return `<span class="sw o${oct}${d.k ? " k" : ""}">${d.t ? '<i class="tv"></i>' : ""}${d.n}</span>`;
+}
+
+let nextId = 1;
+const nid = () => "s" + (nextId++);
+const REP = (times, kids) => ({ id: nid(), type: "repeat", times, children: kids });
+
+// sargam text -> blocks.  S R G m P D N, r g d n komal, M tivra, .X mandra, X' taar, - hold, _ rest, :2 beats, [ ]xN repeat
+function parseSargam(text, unit = 1) {
+  const toks = text.replace(/[|,]/g, " ").replace(/\[/g, " [ ").replace(/\]\s*x\s*(\d+)/gi, " ]x$1 ").split(/\s+/).filter(Boolean);
+  let i = 0;
+  function seq(depth) {
+    const out = [];
+    while (i < toks.length) {
+      const t = toks[i];
+      if (t === "[") {
+        i++; const kids = seq(depth + 1);
+        const m = (toks[i] || "").match(/^\]x(\d+)$/);
+        if (!m) throw Error('A "[" group must end with "]x" and a count, e.g. ]x2');
+        i++; out.push(REP(clamp(+m[1], 1, 99), kids)); continue;
+      }
+      if (/^\]x\d+$/.test(t)) { if (!depth) throw Error('Found "]" without a matching "["'); return out; }
+      i++;
+      if (t === "-") {
+        const p = out[out.length - 1];
+        if (!p || p.type === "repeat") throw Error('"-" (hold) must come right after a swara or rest');
+        p.beats += unit; continue;
+      }
+      let m = t.match(/^_(?::([\d.]+))?$/);
+      if (m) { out.push({ id: nid(), type: "rest", beats: m[1] ? +m[1] : unit }); continue; }
+      m = t.match(/^(\.?)([SrRgGmMPdDnN])('{0,2})(?::([\d.]+))?$/);
+      if (!m) throw Error(`Can't read "${t}"`);
+      if (m[1] && m[3]) throw Error(`"${t}" can't be both mandra and taar`);
+      out.push({ id: nid(), type: "swara", sw: m[2], oct: m[1] ? -1 : m[3].length, beats: m[4] ? +m[4] : unit });
+    }
+    return out;
+  }
+  return seq(0);
+}
+
+/* =================================================================
+   Ready compositions
+   ================================================================= */
+const COMPS = [
+  { title: "Bilawal thaat: aaroh and avaroh", meta: "All seven shuddha swaras, which is the C major scale. Seven different loop sizes, going up and then down.",
+    bpm: 100, unit: 1, text: "S R G m P D N S' - S' N D P m G R S - -" },
+  { title: "Alankar: groups of three", meta: "A practice pattern: Sa Re Ga, Re Ga Ma, Ga Ma Pa… going up, then the same going down.",
+    bpm: 100, unit: 0.5, text: "S R G R G m G m P m P D P D N D N S' - S' N D N D P D P m P m G m G R G R S - - -" },
+  { title: "Paltas: Repeats inside a Repeat", meta: "Each small phrase is played twice by an inner Repeat, and the whole pair twice by an outer one: two loop counters, one inside the other.",
+    bpm: 110, unit: 0.5, text: "[ [ S R G R ]x2 [ G m P m ]x2 ]x2 [ P D N D ]x2 S' - - -" },
+  { title: "Raag Bhupali", meta: "Pentatonic: Sa Re Ga Pa Dha (no Ma, no Ni). Aaroh, avaroh, then the pakad (signature phrase), which dips to mandra Dha.",
+    bpm: 96, unit: 1, text: "S R G P D S' - _ S' D P G R S - _ G R S .D S R G P G D P G R S - -" },
+  { title: "Raag Yaman", meta: "Kalyan thaat, with tivra Ma (F♯). It starts from mandra Ni. Aaroh, avaroh and pakad.",
+    bpm: 92, unit: 1, text: ".N R G M D N S' - S' N D P M G R S - _ .N R G R P R .N R S - -" },
+  { title: "Raag Bhairav", meta: "Komal Re and komal Dha (D♭, A♭): two loops a little longer than their shuddha neighbours, which gives the scale its sombre colour.",
+    bpm: 92, unit: 1, text: "S r G m P d N S' - S' N d P m G r S - -" },
+  { title: "Kafi thaat", meta: "Komal Ga and komal Ni (E♭, B♭).",
+    bpm: 100, unit: 1, text: "S R g m P D n S' - S' n D P m g R S - -" },
+  { title: "Tihai on Bhupali", meta: "A tihai is a phrase played three times that ends on sam (the first beat). Two passes of a Repeat with a rest, then a third pass that lands on Sa.",
+    bpm: 110, unit: 0.5, text: "S R G P D S' - - [ D P G R S _ ]x2 D P G R S:2" },
+  { title: "Three saptaks", meta: "The shuddha swaras from mandra Sa (C3) up to ati-taar Sa (C6). The loop shrinks from 489 to 61 instructions at 64,000 instr/s.",
+    bpm: 132, unit: 0.5, text: ".S .R .G .m .P .D .N S R G m P D N S' R' G' m' P' D' N' S'' - - -" },
+];
+
+/* =================================================================
+   Rendering blocks (shared by cards and editor)
+   ================================================================= */
+const FRAC = { 0.25: "¼", 0.5: "½", 0.75: "¾", 1.5: "1½", 2.5: "2½" };
+const fmtB = x => FRAC[x] || String(x);
+function blocksHtml(list) {
+  return list.map(b => {
+    if (b.type === "repeat")
+      return `<span class="rep" data-id="${b.id}"><span class="rephead">⟳×${b.times}<span class="pass"></span></span><span class="repbody">${blocksHtml(b.children)}</span></span>`;
+    if (b.type === "rest")
+      return `<span class="chip rest" data-id="${b.id}" title="rest, ${fmtB(b.beats)} beat(s)"><span class="sw">rest</span><span class="bt">${b.beats !== 1 ? fmtB(b.beats) : ""}</span></span>`;
+    const m = midiOf(b.sw, b.oct);
+    return `<span class="chip" data-id="${b.id}" title="${swLabel(b.sw, b.oct)} = ${westOf(m)}, loop ${loopOf(m)} instructions">${glyph(b.sw, b.oct)}<span class="bt">${b.beats !== 1 ? fmtB(b.beats) : ""}</span></span>`;
+  }).join("");
+}
+
+/* section 1 */
+const compBlocks = COMPS.map(c => parseSargam(c.text, c.unit));
+function renderCards() {
+  $("cards").innerHTML = COMPS.map((c, i) => `
+    <div class="card">
+      <h3>${c.title}</h3>
+      <div class="meta">${c.meta}</div>
+      <div class="line">${blocksHtml(compBlocks[i])}</div>
+      <div class="acts"><button class="primary" data-play="${i}">▶ Play</button><button data-open="${i}">Open in editor ↓</button><span class="meta" style="margin-left:auto">${c.bpm} bpm</span></div>
+    </div>`).join("");
+}
+$("cards").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.play !== undefined) {
+    const i = +b.dataset.play;
+    if (play && play.owner === "card" + i) return stopPlay();
+    playBlocks(compBlocks[i], COMPS[i].bpm, "card" + i, b);
+  } else if (b.dataset.open !== undefined) {
+    const i = +b.dataset.open;
+    mine = { bpm: COMPS[i].bpm, blocks: parseSargam(COMPS[i].text, COMPS[i].unit) };
+    $("bpm").value = mine.bpm; sel = null; saveMine(); renderEditor();
+    $("editor").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
+
+/* section 2: the loop table, which is also the palette */
+function renderTable() {
+  const head = `<tr><th></th>${ORDER.split("").map(k => `<th>${SW[k].n}${SW[k].k ? " (k)" : SW[k].t ? " (t)" : ""}</th>`).join("")}<th></th></tr>`;
+  const rows = [-1, 0, 1].map(oct => `<tr><th>${SAPTAK[oct]}</th>${ORDER.split("").map(k => cellHtml(k, oct)).join("")}
+      <td>${oct === 1 ? cellHtml("S", 2, true) : ""}</td></tr>`).join("");
+  $("loopTable").innerHTML = head + rows;
+  let worst = 0;
+  for (let m = 48; m <= 84; m++) worst = Math.max(worst, Math.abs(centsOf(m)));
+  $("legend").innerHTML = `At ${RATE.toLocaleString()} instr/s the loops run from ${loopOf(48)} instructions (mandra Sa) down to ${loopOf(84)} (ati-taar Sa), and the worst note is ${worst.toFixed(1)}¢ off true pitch (100¢ = one semitone). Colour of the ¢ figure: <span class="cents ok">under 10¢, inaudible</span> · <span class="cents meh">10–25¢, a trained ear notices</span> · <span class="cents bad">over 25¢, sounds out of tune</span>.`;
+}
+function cellHtml(k, oct, bare) {
+  const m = midiOf(k, oct), c = centsOf(m), cls = Math.abs(c) < 10 ? "ok" : Math.abs(c) < 25 ? "meh" : "bad";
+  const td = `<span class="cell" data-sw="${k}" data-oct="${oct}" title="Add ${swLabel(k, oct)}">${glyph(k, oct)}
+      <span class="d">${westOf(m)}<br><b>${loopOf(m)}</b> instr<br>${(RATE / loopOf(m)).toFixed(1)} Hz<br><span class="cents ${cls}">${c >= 0 ? "+" : "−"}${Math.abs(c).toFixed(1)}¢</span></span></span>`;
+  return bare ? td : `<td>${td}</td>`;
+}
+$("loopTable").addEventListener("click", e => {
+  const c = e.target.closest(".cell"); if (!c) return;
+  const b = { id: nid(), type: "swara", sw: c.dataset.sw, oct: +c.dataset.oct, beats: unit };
+  insert([b]);
+  if ($("preview").checked) playBlocks([{ ...b, beats: 1 }], 120, "preview");
+});
+
+/* =================================================================
+   Editor (section 2)
+   ================================================================= */
+const KEY = "sargam-lab-v1";
+let mine = { bpm: 100, blocks: [] }, sel = null, into = false, unit = 1;
+function reid(list) { list.forEach(b => { b.id = nid(); if (b.children) reid(b.children); }); return list; }
+function loadMine() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && Array.isArray(s.blocks)) return { bpm: clamp(+s.bpm || 100, 30, 300), blocks: reid(s.blocks) };
+  } catch (e) {}
+  return { bpm: 100, blocks: parseSargam("S R G m P - - - [ D N S' ]x2 S' N D P m G R S - - -") };
+}
+function saveMine() { try { localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) {} }
+function find(id, list = mine.blocks, parent = null) {
+  for (let i = 0; i < list.length; i++) {
+    const b = list[i]; if (b.id === id) return { b, list, i, parent };
+    if (b.children) { const r = find(id, b.children, b); if (r) return r; }
+  }
+  return null;
+}
+function flatIds(list = mine.blocks, out = []) { list.forEach(b => { out.push(b.id); if (b.children) flatIds(b.children, out); }); return out; }
+
+// insert after the selection (or inside a Repeat that is selected in "into" mode)
+function insert(blocks) {
+  for (const b of blocks) {
+    const f = sel && find(sel);
+    if (!f) mine.blocks.push(b);
+    else if (f.b.type === "repeat" && into) f.b.children.push(b);
+    else f.list.splice(f.i + 1, 0, b);
+    sel = b.id; into = false;
+  }
+  if (blocks.length === 1 && blocks[0].type === "repeat") into = true;   // a new Repeat starts filling itself
+  saveMine(); renderEditor();
+}
+function renderEditor() {
+  const ed = $("editor");
+  ed.innerHTML = mine.blocks.length ? `<div class="line">${blocksHtml(mine.blocks)}</div>`
+    : `<div class="empty">Empty. Click swaras in the table above, or type sargam into the box.</div>`;
+  const s = sel && ed.querySelector(`[data-id="${sel}"]`);
+  if (s) { s.classList.add("sel"); if (into) s.classList.add("into"); } else sel = null;
+  renderSelbar();
+}
+function renderSelbar() {
+  const f = sel && find(sel), bar = $("selbar");
+  if (!f) { bar.innerHTML = `<span>Nothing selected: new blocks go at the end. Click a block to select it, and new blocks go after it.</span>`; return; }
+  const b = f.b;
+  const beatBtns = [0.25, 0.5, 1, 1.5, 2, 3, 4].map(x => `<button data-beats="${x}" class="${b.beats === x ? "on" : ""}">${fmtB(x)}</button>`).join("");
+  const what = b.type === "swara" ? `<b>${swLabel(b.sw, b.oct)}</b> (${westOf(midiOf(b.sw, b.oct))}, loop ${loopOf(midiOf(b.sw, b.oct))} instr)` : b.type === "rest" ? "<b>rest</b>" : "<b>Repeat</b>";
+  bar.innerHTML = `Selected: ${what}
+    ${b.type === "repeat"
+      ? `<input type="number" id="times" min="1" max="99" value="${b.times}"> times
+         <span>new blocks go</span><button data-into="1" class="${into ? "on" : ""}">inside it</button><button data-into="0" class="${into ? "" : "on"}">after it</button>`
+      : `<span>beats</span>${beatBtns}`}
+    <button data-mv="-1" title="Move left">◀</button><button data-mv="1" title="Move right">▶</button>
+    <button data-dup="1">⧉ Duplicate</button><button data-del="1">✕ Delete</button><button data-desel="1">Deselect</button>`;
+}
+
+$("editor").addEventListener("click", e => {
+  const el = e.target.closest(".chip, .rephead");
+  if (!el) { sel = null; into = false; return renderEditor(); }
+  const id = el.classList.contains("rephead") ? el.parentElement.dataset.id : el.dataset.id;
+  if (sel === id && el.classList.contains("rephead")) into = !into; else { sel = id; into = el.classList.contains("rephead"); }
+  renderEditor();
+});
+$("selbar").addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  const f = find(sel); if (!f) return;
+  if (t.dataset.beats) f.b.beats = +t.dataset.beats;
+  else if (t.dataset.into) into = t.dataset.into === "1";
+  else if (t.dataset.mv) move(f, +t.dataset.mv);
+  else if (t.dataset.dup) { const c = reid([JSON.parse(JSON.stringify(f.b))])[0]; f.list.splice(f.i + 1, 0, c); sel = c.id; }
+  else if (t.dataset.del) del(f);
+  else if (t.dataset.desel) { sel = null; into = false; }
+  saveMine(); renderEditor();
+});
+$("selbar").addEventListener("input", e => {
+  if (e.target.id !== "times") return;
+  const v = parseInt(e.target.value, 10), f = find(sel);
+  if (f && v >= 1) { f.b.times = clamp(v, 1, 99); saveMine(); $("editor").querySelector(`[data-id="${sel}"] .rephead`).firstChild.textContent = `⟳×${f.b.times}`; }
+});
+function move(f, dir) {
+  const j = f.i + dir;
+  if (j >= 0 && j < f.list.length) { [f.list[f.i], f.list[j]] = [f.list[j], f.list[f.i]]; return; }
+  if (!f.parent) return;                               // at the edge of a Repeat: step out of it
+  const p = find(f.parent.id);
+  f.list.splice(f.i, 1); p.list.splice(dir < 0 ? p.i : p.i + 1, 0, f.b);
+}
+function del(f) {
+  f.list.splice(f.i, 1);
+  const prev = f.list[f.i - 1] || f.list[f.i];
+  sel = prev ? prev.id : f.parent ? f.parent.id : null; into = !prev && !!f.parent;
+}
+document.addEventListener("keydown", e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const f = sel && find(sel);
+  if ((e.key === "Delete" || e.key === "Backspace") && f) { e.preventDefault(); del(f); saveMine(); renderEditor(); }
+  else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && mine.blocks.length) {
+    e.preventDefault();
+    const ids = flatIds(), k = ids.indexOf(sel);
+    sel = ids[clamp(k < 0 ? 0 : k + (e.key === "ArrowLeft" ? -1 : 1), 0, ids.length - 1)]; into = false; renderEditor();
+  } else if (e.key === "Escape") { sel = null; into = false; renderEditor(); }
+  else if (e.key === " ") { e.preventDefault(); play ? stopPlay() : $("playMine").click(); }
+});
+
+document.querySelectorAll("[data-unit]").forEach(b => b.onclick = () => {
+  unit = +b.dataset.unit; document.querySelectorAll("[data-unit]").forEach(x => x.classList.toggle("on", x === b));
+});
+$("addRest").onclick = () => insert([{ id: nid(), type: "rest", beats: unit }]);
+$("addRep").onclick = () => insert([REP(2, [])]);
+$("bpm").oninput = () => { const v = parseInt($("bpm").value, 10); if (v >= 30 && v <= 300) { mine.bpm = v; saveMine(); } };
+$("clearMine").onclick = () => { if (confirm("Clear the whole composition?")) { mine.blocks = []; sel = null; saveMine(); renderEditor(); } };
+$("playMine").onclick = () => { if (play && play.owner === "mine") return stopPlay(); playBlocks(mine.blocks, mine.bpm, "mine", $("playMine")); };
+function typeAdd() {
+  $("typeErr").textContent = "";
+  try { const bl = parseSargam($("typeBox").value, unit); if (!bl.length) return; insert(bl); $("typeBox").value = ""; }
+  catch (err) { $("typeErr").textContent = err.message; }
+}
+$("typeAdd").onclick = typeAdd;
+$("typeBox").addEventListener("keydown", e => { if (e.key === "Enter") typeAdd(); });
+
+/* =================================================================
+   Player: a note = N trips round its loop, one speaker click per trip.
+   Timing mirrors the compiled machine code of the main simulator.
+   ================================================================= */
+let ctx = null, src = null, play = null, flashUntil = 0;
+function ensureAudio() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+  src = ctx.createConstantSource(); src.offset.value = 0;
+  const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 25;
+  const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 5000;
+  const g = ctx.createGain(); g.gain.value = 0.2;
+  src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(ctx.destination); src.start();
+}
+// flatten blocks into timed events (instruction-time units); Repeats unroll, remembering which pass they're on
+function timeline(blocks, bpm) {
+  const beat = 60 / bpm * RATE, ev = [];
+  let t = 0;
+  (function walk(list, anc) {
+    for (const b of list) {
+      if (b.type === "repeat") { for (let p = 1; p <= b.times; p++) walk(b.children, [...anc, { id: b.id, pass: p, times: b.times }]); continue; }
+      const total = b.beats * beat;
+      if (b.type === "swara") {
+        const m = midiOf(b.sw, b.oct), L = loopOf(m);
+        ev.push({ b, m, L, trips: Math.max(1, Math.round(total * 0.88 / L)), start: t, anc });
+      } else ev.push({ b, rest: true, start: t, anc });
+      t += total;
+    }
+  })(blocks, []);
+  return { ev, end: t };
+}
+async function playBlocks(blocks, bpm, owner, btn) {
+  stopPlay();
+  if (!blocks.length) return;
+  ensureAudio(); await ctx.resume();
+  const { ev, end } = timeline(blocks, bpm);
+  play = { ev, end, owner, btn, t0: ctx.currentTime + 0.06, ei: 0, pk: 0, ui: -1 };
+  if (btn) btn.textContent = "■ Stop";
+  $("stopBtn").disabled = false;
+}
+function stopPlay() {
+  if (!play) return;
+  const t = ctx.currentTime;
+  src.offset.cancelScheduledValues(t); src.offset.setValueAtTime(0, t);
+  if (play.btn) play.btn.textContent = play.owner === "mine" ? "▶ Play composition" : "▶ Play";
+  play = null; highlight(null);
+  $("stopBtn").disabled = true;
+  $("nowText").innerHTML = `— <small>nothing playing</small>`;
+}
+$("stopBtn").onclick = stopPlay;
+
+function pump() {
+  if (!play) return;
+  const dt = 1 / RATE, horizon = ctx.currentTime + 0.15;
+  while (play.ei < play.ev.length) {
+    const e = play.ev[play.ei];
+    if (e.rest || play.pk >= e.trips) { play.ei++; play.pk = 0; continue; }
+    const t = play.t0 + (e.start + play.pk * e.L) * dt;
+    if (t > horizon) break;
+    // HOOT: the speaker is held on for a quarter of each trip, so the click carries enough energy to be heard
+    src.offset.setValueAtTime(1, t); src.offset.setValueAtTime(0, t + e.L * dt * 0.25);
+    play.pk++;
+  }
+}
+setInterval(pump, 25);
+
+let litIds = [];
+function highlight(e) {
+  litIds.forEach(id => document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
+    el.classList.remove("playing", "inside"); const p = el.querySelector(":scope > .rephead .pass"); if (p) p.textContent = "";
+  }));
+  document.querySelectorAll(".cell.flash").forEach(c => c.classList.remove("flash"));
+  litIds = [];
+  if (!e) return;
+  const scope = play.owner === "preview" ? null : play.owner === "mine" ? $("editor") : $("cards");
+  if (scope) {
+    scope.querySelectorAll(`[data-id="${e.b.id}"]`).forEach(el => el.classList.add("playing"));
+    litIds.push(e.b.id);
+    for (const a of e.anc) {
+      scope.querySelectorAll(`[data-id="${a.id}"]`).forEach(el => {
+        el.classList.add("inside"); el.querySelector(":scope > .rephead .pass").textContent = `${a.pass} of ${a.times}`;
+      });
+      litIds.push(a.id);
+    }
+  }
+  if (!e.rest) { const c = document.querySelector(`.cell[data-sw="${e.b.sw}"][data-oct="${e.b.oct}"]`); if (c) c.classList.add("flash"); }
+}
+
+function frame() {
+  if (play) {
+    const now = ctx.currentTime, dt = 1 / RATE;
+    let k = play.ui;
+    while (k + 1 < play.ev.length && play.t0 + play.ev[k + 1].start * dt <= now) k++;
+    if (k !== play.ui && k >= 0) {
+      play.ui = k; const e = play.ev[k];
+      highlight(e);
+      if (e.rest) $("nowText").innerHTML = `rest <small>silence</small>`;
+      else {
+        const f = RATE / e.L, c = centsOf(e.m);
+        $("nowText").innerHTML = `${glyph(e.b.sw, e.b.oct)} <small>${swLabel(e.b.sw, e.b.oct)} · ${westOf(e.m)} · loop ${e.L} instr → ${f.toFixed(1)} Hz (true ${hzOf(e.m).toFixed(1)}, ${c >= 0 ? "+" : "−"}${Math.abs(c).toFixed(1)}¢)</small>`;
+      }
+    }
+    // speaker cone: lit while the current note is sounding
+    if (k >= 0) {
+      const e = play.ev[k], tEnd = play.t0 + (e.start + (e.rest ? 0 : e.trips * e.L)) * dt;
+      $("cone").classList.toggle("on", !e.rest && now < tEnd);
+    }
+    if (now > play.t0 + play.end * dt + 0.05) stopPlay();
+  } else $("cone").classList.remove("on");
+  requestAnimationFrame(frame);
+}
+
+$("rate").onchange = () => {
+  stopPlay(); RATE = +$("rate").value;
+  renderTable(); renderCards(); renderEditor();      // loop sizes, tuning and tooltips all change
+};
+
+/* boot */
+mine = loadMine(); $("bpm").value = mine.bpm;
+renderTable(); renderCards(); renderEditor();
+requestAnimationFrame(frame);
+</script>
+<script src="slides/demo-bridge.js"></script>
+</body>
+</html>

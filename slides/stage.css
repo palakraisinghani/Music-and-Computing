@@ -1,0 +1,81 @@
+/* =====================================================================
+   stage.css: the slides shown through a painted puppet-theatre booth
+   (after the reference picture in slides/ref/sound-of-music-theatre-setup.jpg).
+
+   Enabled by <body class="theatre-on" data-stage="theatre">. Press T to toggle.
+   Design canvas: 2040 × 1310 units. The booth façade (built by deck.js as one SVG)
+   is 1960 × 1230 at (40, 30); the 1600 × 900 slide fills its opening at (220, 240).
+   ===================================================================== */
+
+.theatre { display: contents; }
+.theatre > :not(.deck) { display: none; }
+
+body.theatre-on { background: #000; }
+body.theatre-on .theatre {
+  display: block;
+  position: absolute; left: 50%; top: 50%;
+  width: 2040px; height: 1310px;
+  transform: translate(-50%, -50%) scale(var(--tscale, .5));
+  transform-origin: center;
+  /* the room: dark wood walls with gilded panel mouldings */
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(255, 255, 255, .05), transparent 65%),
+    repeating-linear-gradient(90deg, transparent 0 22px, rgba(196, 162, 101, .16) 22px 24px, transparent 24px 316px, rgba(196, 162, 101, .16) 316px 318px, transparent 318px 340px),
+    linear-gradient(#0b0b0d, #030303);
+}
+body.theatre-on .theatre > :not(.deck) { display: block; }
+
+/* parquet floor in front of the booth */
+.room-floor {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 70px; z-index: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .5) 0 2px, transparent 2px 90px),
+    linear-gradient(#1d1a17, #0a0908);
+}
+
+body.theatre-on .theatre .deck {
+  left: 220px; top: 240px;
+  transform: none;
+  box-shadow: none;
+  z-index: 2;
+}
+
+/* the booth façade sits over the slide; only its opening shows the slide */
+.facade {
+  position: absolute; left: 40px; top: 30px; width: 1960px; height: 1230px; z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .65));
+}
+.facade svg { width: 100%; height: 100%; display: block; }
+
+/* the paper's rolled-up lower edge travels down as it unrolls */
+.batten {
+  position: absolute; left: 214px; width: 1612px; height: 16px; top: 1132px; z-index: 3; border-radius: 8px;
+  background: linear-gradient(#fbf6ea, #d9cfbb 55%, #9c8f78);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .55);
+  opacity: 0;
+}
+.theatre.rolling .batten { animation: lower 1.3s cubic-bezier(.45, .05, .3, 1) both; }
+@keyframes lower {
+  0% { top: 232px; opacity: 1; } 92% { opacity: 1; } 100% { top: 1132px; opacity: 0; }
+}
+
+/* the paper unrolls; the previous one stays behind until covered */
+body.theatre-on .slide { transition: none; }
+body.theatre-on .slide.active { animation: unroll 1.3s cubic-bezier(.45, .05, .3, 1) both; }
+body.theatre-on .slide.leaving { opacity: 1; visibility: visible; z-index: 1; }
+@keyframes unroll { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* contents appear once the paper is down */
+body.theatre-on .slide.active [data-anim] { animation-delay: calc(var(--d, .2s) + 1s); }
+body.theatre-on .slide.active [data-anim="type"] > span { animation-delay: calc(var(--d, .3s) + 1s + var(--i) * var(--speed, 60ms)); }
+body.theatre-on .slide.active [data-anim="draw"] [pathLength] { animation-delay: calc(var(--d, .2s) + 1s + var(--k, 0) * .12s); }
+
+@media (prefers-reduced-motion: reduce) {
+  .theatre.rolling .batten, body.theatre-on .slide.active { animation: none !important; }
+}
+@media print {
+  .theatre { display: contents !important; transform: none !important; }
+  .theatre > :not(.deck) { display: none !important; }
+  body.theatre-on .theatre .deck { left: auto; top: auto; }
+}

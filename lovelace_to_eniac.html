@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>From Lovelace to ENIAC — a storyline</title>
+<title>From Lovelace to GROOVE — a storyline</title>
 <style>
   :root {
     --bg: #faf8f3; --panel: #f1ede3; --card: #fffdf9; --ink: #2a2520; --muted: #786f60;
@@ -52,6 +52,19 @@
   .pager button:hover { border-color: var(--accent); }
   .sources { font: 13px -apple-system, sans-serif; color: var(--muted); }
   .sources ul { padding-left: 18px; margin: 6px 0; }
+  .demo .btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+  .demo button { font: 13px -apple-system, sans-serif; background: var(--bg); border: 1px solid var(--line);
+                 border-radius: 4px; padding: 7px 12px; cursor: pointer; color: var(--ink); }
+  .demo button:hover { border-color: var(--accent); }
+  .demo button.on { border-color: var(--accent); background: #f6ecdc; }
+  table.mini { width: 100%; border-collapse: collapse; font: 12.5px/1.4 -apple-system, sans-serif; }
+  table.mini th, table.mini td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+  table.mini th:first-child, table.mini td:first-child { text-align: left; }
+  table.mini th { color: var(--muted); font-weight: 600; }
+  table.mini .bad { color: #a8452b; font-weight: 600; }
+  .scroll-x { overflow-x: auto; }
+  .slide a { color: var(--accent); text-decoration-color: var(--accent-soft); text-underline-offset: 3px; }
+  .slide a:hover { text-decoration-color: var(--accent); }
 
   @media (max-width: 720px) {
     body { flex-direction: column; }
@@ -66,11 +79,11 @@
 
 <nav>
   <header>
-    <h1>Lovelace → ENIAC</h1>
+    <h1>Lovelace → GROOVE</h1>
     <p>A storyline on memory, music &amp; machines</p>
   </header>
   <ul id="navlist"></ul>
-  <footer>5 slides · scroll or click to jump</footer>
+  <footer id="navfoot">scroll or click to jump</footer>
 </nav>
 
 <main id="main"></main>
@@ -78,7 +91,145 @@
 <script>
 const esc = s => s;
 
+/* ---------- helpers for the digital-sound slides ---------- */
+
+// Ferranti Mark 1: one "beat" of the machine clock = 0.24 ms. A note made by looping
+// the hoot instruction has a period that is a whole number of beats.
+const BEAT = 240e-6;
+const NOTE_HZ = { "F#": 369.99, "G": 392.00, "A": 440.00, "B": 493.88, "C": 523.25 };
+// God Save the King (G major), [note, beats of the tune]
+const ANTHEM = [["G",1],["G",1],["A",1],["F#",1.5],["G",.5],["A",1],
+                ["B",1],["B",1],["C",1],["B",1.5],["A",.5],["G",1],
+                ["A",1],["G",1],["F#",1],["G",3]];
+const gridBeats = f => Math.max(1, Math.round(1 / (f * BEAT)));
+const gridHz = f => 1 / (gridBeats(f) * BEAT);
+const cents = (a, b) => 1200 * Math.log2(a / b);
+
+function gridTable() {
+  const rows = ["F#", "G", "A", "B", "C"].map(n => {
+    const cells = [1, 0.5].map(oct => {
+      const f = NOTE_HZ[n] * oct, g = gridHz(f), c = cents(g, f);
+      return `<td>${f.toFixed(0)}</td><td>${gridBeats(f)}</td><td>${g.toFixed(0)}</td>` +
+             `<td class="${Math.abs(c) > 35 ? "bad" : ""}">${c > 0 ? "+" : ""}${c.toFixed(0)}</td>`;
+    }).join("");
+    return `<tr><td>${n}</td>${cells}</tr>`;
+  }).join("");
+  return `<div class="scroll-x"><table class="mini">
+    <tr><th></th><th colspan="4" style="text-align:center">upper register</th><th colspan="4" style="text-align:center">one octave lower</th></tr>
+    <tr><th>note</th><th>target Hz</th><th>beats</th><th>gets Hz</th><th>cents off</th><th>target Hz</th><th>beats</th><th>gets Hz</th><th>cents off</th></tr>
+    ${rows}</table></div>`;
+}
+
+// Sampled sine wave figure. mode "dac": staircase + smoothed output; "adc": signal + level grid + rounded samples.
+function sampleSVG(mode) {
+  const W = 540, H = 170, x0 = 30, x1 = 510, mid = 85, amp = 58, N = 16, L = 8;
+  const y = x => mid - amp * Math.sin(2 * Math.PI * (x - x0) / (x1 - x0) * 1.25);
+  const lvl = v => { const step = 2 * amp / (L - 1); return mid - amp + Math.round((v - (mid - amp)) / step) * step; };
+  let curve = "";
+  for (let x = x0; x <= x1; x += 3) curve += (curve ? " L" : "M") + x + " " + y(x).toFixed(1);
+  const xs = Array.from({ length: N }, (_, i) => x0 + i * (x1 - x0) / N);
+  const dx = (x1 - x0) / N;
+  let out = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${mode === "dac" ? "Numbers become a staircase voltage which a filter smooths into a wave" : "A continuous signal is sampled at regular instants and each sample rounded to one of eight levels"}">`;
+  if (mode === "adc") {
+    for (let k = 0; k < L; k++) {
+      const yy = mid - amp + k * 2 * amp / (L - 1);
+      out += `<line x1="${x0}" x2="${x1}" y1="${yy}" y2="${yy}" stroke="#e2dcca" stroke-width="1"/>`;
+      out += `<text x="${x0 - 8}" y="${yy + 4}" text-anchor="end" font-family="-apple-system, sans-serif" font-size="10" fill="#b5ac98">${L - 1 - k}</text>`;
+    }
+    out += `<path d="${curve}" fill="none" stroke="#2a2520" stroke-width="1.5"/>`;
+    xs.forEach(x => {
+      out += `<line x1="${x}" x2="${x}" y1="${mid - amp - 4}" y2="${mid + amp + 4}" stroke="#c9a66b" stroke-width="1" stroke-dasharray="2 3"/>`;
+      out += `<circle cx="${x}" cy="${lvl(y(x))}" r="4" fill="#8a5a2b"/>`;
+    });
+    out += `<text x="${x1}" y="${H - 4}" text-anchor="end" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">dots: sampled, then rounded to the nearest of 8 levels (3 bits)</text>`;
+  } else {
+    let stairs = "";
+    xs.forEach((x, i) => { const v = lvl(y(x)); stairs += (i ? ` L${x} ${v}` : `M${x} ${v}`) + ` L${x + dx} ${v}`; });
+    out += `<path d="${curve}" fill="none" stroke="#c9a66b" stroke-width="2" stroke-dasharray="5 4"/>`;
+    out += `<path d="${stairs}" fill="none" stroke="#8a5a2b" stroke-width="2"/>`;
+    out += `<text x="${x0}" y="14" font-family="-apple-system, sans-serif" font-size="11" fill="#8a5a2b">solid: DAC output, each number held until the next</text>`;
+    out += `<text x="${x0}" y="${H - 4}" font-family="-apple-system, sans-serif" font-size="11" fill="#a8873f">dashed: after the smoothing (reconstruction) filter</text>`;
+  }
+  return out + `</svg>`;
+}
+
+function grooveSVG() {
+  const box = (x, y, w, h, a, b, strong) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${strong ? "#f6ecdc" : "#fffdf9"}" stroke="${strong ? "#8a5a2b" : "#2a2520"}" stroke-width="1.5"/>
+     <text x="${x + w / 2}" y="${y + h / 2 - (b ? 3 : -4)}" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#2a2520">${a}</text>
+     ${b ? `<text x="${x + w / 2}" y="${y + h / 2 + 13}" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#786f60">${b}</text>` : ""}`;
+  const arr = (x1, y1, x2, y2) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="#2a2520" stroke-width="1.5" marker-end="url(#arrow3)"/>`;
+  return `<svg viewBox="0 0 600 190" width="600" height="190" role="img" aria-label="GROOVE signal loop: performer controls go through an ADC into the computer, out through a DAC to an analog synthesizer and speaker, and back to the performer's ear">
+    <defs><marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#2a2520"/></marker></defs>
+    ${box(8, 30, 112, 56, "performer", "knobs · joystick · keys")}
+    ${arr(120, 58, 146, 58)}
+    ${box(148, 38, 52, 40, "ADC", "", true)}
+    ${arr(200, 58, 226, 58)}
+    ${box(228, 30, 140, 56, "DDP-224 + disk", "stored functions of time")}
+    ${arr(368, 58, 394, 58)}
+    ${box(396, 38, 52, 40, "DAC", "", true)}
+    ${arr(448, 58, 474, 58)}
+    ${box(476, 30, 116, 56, "analog synth", "VCO · VCF · VCA")}
+    ${arr(534, 86, 534, 118)}
+    ${box(494, 120, 80, 36, "speaker", "")}
+    <path d="M494 138 L64 138 L64 92" fill="none" stroke="#c9a66b" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow3)"/>
+    <text x="280" y="160" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#786f60">the performer listens and adjusts: a loop closed in real time</text>
+    <text x="298" y="18" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#786f60">control rate ≈ 100 updates/s, not audio rate</text>
+  </svg>`;
+}
+
+// Web Audio playback for the 1-bit demo
+let actx = null, voices = [];
+function stopTune() { voices.forEach(o => { try { o.stop(); } catch (e) {} }); voices = []; }
+function playTune(mode) {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  actx = actx || new AC();
+  if (actx.state === "suspended") actx.resume();
+  stopTune();
+  if (mode === "stop") return;
+  const beat = 0.42, oct = mode === "low" ? 0.5 : 1;
+  let t = actx.currentTime + 0.05;
+  ANTHEM.forEach(([n, d]) => {
+    const target = NOTE_HZ[n] * oct, f = mode === "ideal" ? target : gridHz(target);
+    const o = actx.createOscillator(), g = actx.createGain(), dur = d * beat;
+    o.type = "square";           // a 1-bit speaker can only make on/off (square/pulse) waves
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.06, t + 0.006);
+    g.gain.setValueAtTime(0.06, t + dur - 0.04);
+    g.gain.linearRampToValueAtTime(0, t + dur - 0.01);
+    o.connect(g).connect(actx.destination);
+    o.start(t); o.stop(t + dur);
+    voices.push(o);
+    t += dur;
+  });
+}
+
 const SLIDES = [
+
+/* ---------------- 0. ABSTRACT ---------------- */
+{
+  kicker: "Abstract",
+  title: "Abstract: Listening to the Machine",
+  dek: "How music, and sound more broadly, served as a lens on what a computer is, from Lovelace's symbolic engine to Bell Labs' real-time GROOVE system.",
+  body: `
+    <p class="lede">This project traces how music shaped, revealed and tested the idea of the computer between 1843 and the late 1970s. It begins with Ada Lovelace's notes on the Analytical Engine, in which she observed that the engine might compose music. That observation was central to her vision of what we would now call a general-purpose computer. Because music is already a discrete symbolic system, with a finite alphabet of pitches and durations combined under explicit rules, it offered a clear argument that a computing machine could be understood as manipulating <em>symbols and relations</em>, not just quantities.</p>
+    <p>The project then follows this thread into electronic hardware. ENIAC (1945) was fast but had almost no memory and no stored program. Mercury delay lines solved the memory problem by storing bits as sound waves travelling through liquid metal. Because sound travels far more slowly than an electrical signal, a short tube of mercury could hold hundreds of bits in transit. Operators who could not inspect a running program learned to read the machine's state from neon bulbs, which showed the digits held in each of ENIAC's accumulators. Monitoring was therefore labour-intensive: people had to watch the glowing panels continuously and record what they saw. Later, sound was used to translate the machine's running state into a signal that could be perceived from outside. This translation was made by audio <strong>transducers</strong>: loudspeakers wired directly to the machine's circuits.</p>
+    <p>The first computer music grew out of this debugging practice. On CSIRAC and the Ferranti Mark 1 (1950–51), a 1-bit speaker could only be switched on or off, so pitch was nothing more than the length of a program loop, quantised to the machine's clock. Max Mathews' MUSIC I (1957) computed the waveform itself, sample by sample, and used a digital-to-analog converter (DAC) to turn those numbers into sound. The analog-to-digital converter (ADC), grounded in the Nyquist–Shannon sampling theorem, let the computer listen in return. GROOVE (c. 1970) joined both converters into a real-time loop between a performer, a computer and an analog synthesizer. Later advances in digital signal processing are beyond the scope of this project. Alongside the storyline, the project includes interactive simulations that explain and demonstrate how these transducers worked.</p>
+
+    <div class="callout">
+      <div class="label">Companion simulations</div>
+      <ul class="points" style="margin-bottom:0">
+        <li><a href="slides/demos/transducer_simulator.html"><strong>Listening to a Program</strong></a>: a toy early computer with a small instruction set and a loudspeaker wired either to a HOOT instruction or to a bit of a register. Tunes are built from blocks that compile to loops, counters and branches, and run at speeds modelled on EDSAC and CSIRAC. You can hear a stuck loop hum, hear which branch is running, and step the machine in slow motion: auditory debugging and 1-bit music, reconstructed.</li>
+        <li><a href="sargam_lab.html"><strong>Sargam Lab</strong></a>: the same loop-as-note model applied to Hindustani music. Each swara across three saptaks becomes a loop of whole instructions. Raag scales, alankars and a tihai can be played or composed in sargam notation, and every note shows how many cents it falls from true pitch. It shows the clock grid's compromise with a musical system outside the Western one Lovelace had in mind, and shows that a faster machine buys finer tuning.</li>
+      </ul>
+    </div>
+
+    <p style="font:13px -apple-system,sans-serif;color:var(--muted)"><strong>Keywords:</strong> Ada Lovelace · ENIAC · delay-line memory · auditory debugging · 1-bit music · CSIRAC · Ferranti Mark 1 · MUSIC-N · DAC / ADC · sampling theorem · GROOVE · transducers · discreteness</p>
+  `,
+  sources: []
+},
 
 /* ---------------- 1. ADA LOVELACE ---------------- */
 {
@@ -267,6 +418,147 @@ const SLIDES = [
   sources: ["Doug McCann & Peter Thorne, The INS and Outs of CSIRAC (on CSIRAC's speaker)", "Simon Lavington, Early British Computers", "Paul Doornbusch, \"Computer Sound Synthesis in 1951: The Music of CSIRAC\""]
 },
 
+/* ---------------- 6. 1-BIT MUSIC ---------------- */
+{
+  kicker: "1950–1951",
+  title: "1-Bit Music: A Speaker That Only Knows On and Off",
+  dek: "Once a loudspeaker was wired to the machine, programmers realised that if they controlled exactly when it clicked, the clicks would turn into notes. The first computer music was made from nothing but timing.",
+  body: `
+    <p class="lede">The monitoring loudspeakers on the first stored-program machines had an odd property. A program loop that toggled the speaker line at a steady rate produced a steady tone, and a loop that ran faster produced a higher one. So a programmer who could choose how long a loop took could choose the pitch, and a programmer who could chain loops together could play a tune. Within months of these machines first running, people were doing exactly that.</p>
+
+    <h2>What "1-bit" means</h2>
+    <p>The speaker was driven by a single binary line: at any instant the line was either on or off, so the diaphragm was either pushed out or let back. That one bit is the whole output. There is no volume control, no way to shape the waveform, and no way to play two notes at once. The wave that comes out is always a square or pulse wave, buzzy and fixed in timbre. The only musical parameter left is <em>time</em>: how long between toggles sets the pitch, and how long the pattern repeats sets the duration. Music shrinks down to a timetable of clicks.</p>
+
+    <h2>CSIRAC plays "Colonel Bogey" (Sydney, 1950–51)</h2>
+    <p>CSIRAC, Australia's first stored-program computer, was built by Trevor Pearcey and Maston Beard at the CSIR Radiophysics Laboratory in Sydney. Its speaker, usually called the "hooter", was normally used to signal events such as the end of a program. The programmer Geoff Hill wrote routines that sent pulses to it at carefully controlled intervals, and CSIRAC played popular tunes such as the "Colonel Bogey March" to the public at Australia's first Conference on Automatic Computing Machines in August 1951. That makes it one of the very first computers to play music.</p>
+    <p>This connects straight back to the delay-line memory slide. CSIRAC's main memory was a bank of <strong>mercury delay lines</strong>, so when an instruction could run was tied to the circulation of pulses through the mercury. The pitches Hill could reach were therefore set by the timing of the memory, not by any musical scale, and getting a tune to sound in tune was a programming puzzle in its own right. No recording was made at the time. The music was reconstructed decades later by Paul Doornbusch, who used Hill's original program tapes and a model of the machine's timing.</p>
+
+    <h2>Manchester: Turing's "hoot" and Strachey's anthem (1951)</h2>
+    <p>The Ferranti Mark 1 in Manchester, the first commercially sold general-purpose computer, had a "hoot" instruction described in Alan Turing's 1951 programming manual. Each hoot sent one pulse to the speaker, and repeating it in a loop gave a steady note. Turing meant it for signalling, not for music. Christopher Strachey, then a schoolteacher teaching himself to program, wrote a routine that made the machine play "God Save the King". Later in 1951 a BBC team recorded the Mark 1 playing the anthem, "Baa Baa Black Sheep" and part of "In the Mood". It is the oldest known surviving recording of computer-generated music. In 2016 Jack Copeland and Jason Long restored it, correcting a speed error in the original acetate disc that had shifted every pitch.</p>
+
+    <h2>Pitch on a clock grid</h2>
+    <p>The Mark 1 worked in "beats" of about 0.24 ms. A note made by repeating a loop has a period that must be a whole number of beats, so the available frequencies are 1 / (n × 0.24 ms), or roughly 4,167 / n Hz. That grid is coarse where n is small: 8 beats gives 521 Hz and 9 beats gives 463 Hz, a gap of about two semitones with nothing available in between. Lower down the grid gets finer, because one beat more or less is a smaller fraction of a longer period. The table works through the simplest scheme (one fixed loop length per note) for the notes of the anthem. Real programmers found ways round it, such as picking keys and registers that suited the grid or mixing loop lengths within a note.</p>
+
+    <div class="callout demo">
+      <div class="label">Listen: the anthem on a 0.24 ms clock grid</div>
+      <div class="btns">
+        <button data-play="ideal">▶ True pitches</button>
+        <button data-play="high">▶ Grid, upper register</button>
+        <button data-play="low">▶ Grid, one octave lower</button>
+        <button data-play="stop">■ Stop</button>
+      </div>
+      ${gridTable()}
+      <p style="font:12px -apple-system,sans-serif;color:var(--muted);margin:10px 0 0">All three use a square wave, the only waveform a 1-bit speaker can make. In the upper register F# and G fall onto the same 11-beat loop, and so do B and C on the 8-beat loop. The tune falls apart. One octave lower, every note gets its own loop length and the tune is recognisable, although F# is still about a third of a semitone flat.</p>
+    </div>
+
+    <h2>Lovelace's discreteness, turned around</h2>
+    <p>Lovelace thought music suited a machine because music is already discrete. 1-bit music shows the reverse: the machine imposes a discreteness of its own. Its grid comes from the clock, not from the chromatic scale, and the two do not line up. The composer has to work out a compromise between the twelve notes of the octave and the whole numbers of beats. The technique outlived these first machines. The single-bit "beepers" in 1980s home computers and the IBM PC speaker used the same idea, and "1-bit music" survives today as a chiptune genre. But a single on/off line has a hard limit: it can only decide <em>when</em> something happens, never <em>what shape</em> the sound has. To shape the wave itself, the computer would need many output levels at every instant.</p>
+  `,
+  sources: ["Paul Doornbusch, The Music of CSIRAC: Australia's First Computer Music (2005, with CD)", "B. Jack Copeland & Jason Long, \"Turing and the History of Computer Music\" (2017) and the 2016 restoration of the BBC Mark 1 recording", "A. M. Turing, Programmers' Handbook for the Manchester Electronic Computer Mark II (1951), the hoot instruction", "Kenneth McAlpine, Bits and Pieces: A History of Chiptunes (2018)"]
+},
+
+/* ---------------- 7. DAC ---------------- */
+{
+  kicker: "1957",
+  title: "The DAC: Computing the Waveform Itself",
+  dek: "At Bell Labs, Max Mathews stopped asking the computer to click in time and started asking it to calculate the sound wave, number by number, and let a converter turn those numbers into voltage.",
+  body: `
+    <p class="lede">1-bit music played the computer like a metronome. The next step reversed the roles: the computer would not perform at all. Instead it would <em>calculate</em>. Bell Telephone Laboratories was deeply interested in turning speech into numbers so that it could be sent over telephone lines. Max Mathews, an engineer there, saw that the same machinery could run the other way and turn a list of computed numbers into any sound at all.</p>
+
+    <h2>What a digital-to-analog converter does</h2>
+    <p>A DAC takes a binary number and outputs a voltage proportional to it. A classic design uses one switch per bit, each feeding a current weighted by that bit's place value (1, 2, 4, 8, …). The currents add up, so the total is the number expressed as an electrical quantity. A 12-bit converter can produce 4,096 distinct levels, against the 1-bit speaker's two. Feed the DAC a new number at a fixed rate, the <strong>sample rate</strong>, and its output is a staircase that follows the computed wave. A low-pass "reconstruction" filter then smooths the steps away, and the smoothed voltage drives an amplifier and loudspeaker. The DAC is a transducer in the same family as the piezo crystal and the voice coil earlier in this story, except that the boundary it crosses is between the discrete and the continuous.</p>
+
+    <figure>
+      ${sampleSVG("dac")}
+      <figcaption>A DAC holds each computed number as a voltage until the next one arrives. Filtering removes the steps and leaves the intended wave.</figcaption>
+    </figure>
+
+    <h2>MUSIC I and "The Silver Scale"</h2>
+    <p>In 1957 Mathews wrote <strong>MUSIC I</strong> for an IBM 704. The program computed the samples of a sound and wrote them to digital magnetic tape. The tape was then carried to Bell Labs, where a DAC built for speech research turned the numbers back into sound. The first piece made this way was a short study called "The Silver Scale" by Newman Guttman, a Bell Labs psychologist. It is only about seventeen seconds long, but it was the first music synthesised from samples computed by a digital computer. MUSIC I was extremely limited: one voice, one simple waveform, and control only over pitch, loudness and duration. It was also nowhere near real time, because computing a passage took far longer than the passage lasted.</p>
+
+    <h2>From a program to a language</h2>
+    <p>Mathews kept developing the idea through a series of MUSIC programs. The decisive step was <strong>MUSIC III</strong> (1960), which introduced the <em>unit generator</em>: small building blocks such as oscillators, envelope shapers, adders and filters that the composer connects together in software to define an instrument. A piece was split into an <em>orchestra</em> (the instruments, built from unit generators) and a <em>score</em> (the notes those instruments play). Later versions, culminating in the FORTRAN-based MUSIC V in the late 1960s, ran on other machines and spread to Princeton, Stanford and Paris. The orchestra/score split is still used in Csound and in the design of almost every software synthesiser.</p>
+
+    <h2>"Daisy Bell" (1961)</h2>
+    <p>In 1961 an IBM 7094 at Bell Labs sang "Daisy Bell (A Bicycle Built for Two)". John L. Kelly Jr. and Carol Lochbaum synthesised the voice and Mathews programmed the accompaniment. Arthur C. Clarke heard the demonstration on a visit, and it became the song HAL 9000 sings as it is shut down in <em>2001: A Space Odyssey</em> (1968). It is an early example of a computer producing not just tones but something close to a human voice.</p>
+
+    <div class="callout">
+      <div class="label">1-bit vs. many-bit output</div>
+      <ul class="points" style="margin-bottom:0">
+        <li><strong>1-bit speaker:</strong> pitch comes from timing; the timbre is a fixed square wave; one note at a time; real time, but only because the computer's whole job is to keep time.</li>
+        <li><strong>DAC:</strong> any waveform, any mix of voices, any timbre, all as arithmetic. The cost is that every sample, thousands every second, has to be computed. Mathews argued that, in principle, any sound a person can hear could be produced this way.</li>
+      </ul>
+    </div>
+    <p>This is where Lovelace's idea comes true at a deeper level than she imagined. She pictured an engine that arranged musical <em>symbols</em>, the notes of a score. MUSIC I shows a computer working with numbers that are the sound itself, a few thousandths of a second at a time.</p>
+  `,
+  sources: ["Max V. Mathews, \"The Digital Computer as a Musical Instrument\", Science 142 (1963)", "Max V. Mathews, The Technology of Computer Music (MIT Press, 1969), the MUSIC V manual", "Curtis Roads, The Computer Music Tutorial (MIT Press), on MUSIC-N and unit generators", "Bell Labs / Computer History Museum material on \"The Silver Scale\" and \"Daisy Bell\""]
+},
+
+/* ---------------- 8. ADC ---------------- */
+{
+  kicker: "1928 → 1970s",
+  title: "The ADC: Teaching the Computer to Listen",
+  dek: "The DAC lets numbers leave the machine as sound. Its mirror image, the analog-to-digital converter, measures the continuous world and turns it into numbers. Together they give the computer both a voice and ears.",
+  body: `
+    <p class="lede">A DAC solves only half the problem. To analyse a real violin tone, record a singer, or respond to a musician turning a knob, the computer has to go the other way: measure a continuously varying voltage from a microphone or a control and turn it into a stream of numbers. That is the job of the analog-to-digital converter. Before anyone could trust it, though, a theoretical question needed answering: can a finite list of measurements really capture a continuous wave?</p>
+
+    <h2>The sampling theorem</h2>
+    <p>The answer came from communications engineering. Harry Nyquist (1928), working on telegraph signalling, and Claude Shannon (1949) at Bell Labs, building on earlier work by Whittaker and, independently, Kotelnikov, established that a signal containing no frequencies above some limit <em>B</em> can be reconstructed exactly from samples taken more than <em>2B</em> times per second. Human hearing tops out around 20 kHz, so a little over 40,000 samples per second is enough in principle to capture anything we can hear. That is why the compact disc later settled on 44,100. The theorem has a warning built in. Any frequency above half the sample rate does not simply vanish: it <em>aliases</em>, folding back and posing as a lower frequency that was never in the original. So every ADC sits behind an anti-aliasing filter that removes those frequencies before sampling.</p>
+
+    <h2>Quantisation: rounding to the nearest level</h2>
+    <p>Sampling divides up time. Quantisation divides up amplitude: each measured value is rounded to the nearest of 2<sup>N</sup> levels and stored as an N-bit number. The rounding error behaves like a faint hiss called quantisation noise, and each extra bit roughly halves it, adding about 6 dB of dynamic range. Eight bits gives about 48 dB, which is noticeably noisy. Sixteen bits gives about 96 dB, which is CD quality. Here Lovelace's "discrete nature of music" becomes an explicit engineering choice: how many steps in time, and how many steps in loudness, are enough for the ear to stop noticing.</p>
+
+    <figure>
+      ${sampleSVG("adc")}
+      <figcaption>An ADC samples the signal at regular instants (vertical marks) and rounds each sample to a level. The rounded dots are all the computer ever sees.</figcaption>
+    </figure>
+
+    <h2>How an ADC measures: a DAC inside</h2>
+    <p>A common design, the <strong>successive-approximation</strong> converter, shows how closely the two converters are related. It holds the input voltage steady, then plays a game of "higher or lower" against it. An internal DAC produces a trial voltage for the most significant bit, a comparator checks whether the input is above or below it, the bit is kept or dropped, and the process moves on to the next bit. After N comparisons, a binary search, the N-bit number has been found. In other words, the computer listens by repeatedly speaking and checking the result. The underlying idea of coding a waveform as a sequence of numbers, <em>pulse-code modulation</em>, was patented by Alec Reeves in 1937. Bell Labs' wartime SIGSALY secure-telephone system digitised speech for encryption years before any computer played a note.</p>
+
+    <h2>What listening unlocked</h2>
+    <ul class="points">
+      <li><strong>Analysis.</strong> In the mid-1960s Jean-Claude Risset at Bell Labs digitised recordings of trumpet tones and studied them sample by sample. He found that a brass tone grows brighter as it gets louder, its upper harmonics rising faster than the fundamental. Building that rule into a MUSIC-N instrument produced a convincing synthetic trumpet. For the first time, a computer was learning about timbre from real sound.</li>
+      <li><strong>Recording.</strong> By the 1970s the same ADC-to-numbers-to-DAC chain had become digital recording: Denon's PCM recordings in Japan from 1972, Thomas Stockham's Soundstream system in the US from 1976, and eventually the compact disc in 1982.</li>
+      <li><strong>Gesture.</strong> An ADC does not care whether the voltage comes from a microphone or from a knob. Wire one to a performer's controls and the computer can follow a human gesture as it happens. That is the step the next machine took.</li>
+    </ul>
+  `,
+  sources: ["H. Nyquist, \"Certain Topics in Telegraph Transmission Theory\" (1928)", "C. E. Shannon, \"Communication in the Presence of Noise\", Proc. IRE (1949)", "A. H. Reeves, French patent 852,183 (1938) / British patent 535,860, pulse-code modulation", "J.-C. Risset & M. V. Mathews, \"Analysis of Musical-Instrument Tones\", Physics Today (1969)", "Ken Pohlmann, Principles of Digital Audio, on SAR converters, quantisation and early PCM recorders"]
+},
+
+/* ---------------- 9. GROOVE ---------------- */
+{
+  kicker: "1968–1979",
+  title: "GROOVE: Playing a Computer in Real Time",
+  dek: "Bell Labs' GROOVE system wired ADCs and DACs around a minicomputer and an analog synthesizer, so that a musician could perform with the machine, record the performance as data, and then edit it.",
+  body: `
+    <p class="lede">By the late 1960s computer music had two incompatible halves. MUSIC-N could make any sound, but slowly: a composer submitted a job and heard the result hours or days later. The new analog voltage-controlled synthesizers of Moog and Buchla were immediate and playable, but a complex performance on dozens of knobs could not be stored, repeated exactly, or revised. Max Mathews and F. Richard Moore's <strong>GROOVE</strong> (<em>Generated Real-time Output Operations on Voltage-controlled Equipment</em>), running at Bell Labs from about 1970, combined the two.</p>
+
+    <h2>The architecture: converters on both sides</h2>
+    <p>At the centre was a Honeywell DDP-224 minicomputer with a disk drive. On the input side, ADCs read the performer's controls: knobs, a keyboard, and a three-dimensional joystick. On the output side, DACs produced <em>control voltages</em> that drove the oscillators, filters and amplifiers of an analog modular synthesizer. The key design choice was that the computer did not compute the audio. That was still far beyond real-time speed. It computed only the slowly changing <em>controls</em>: pitch, loudness, filter settings. These change perhaps a hundred times a second rather than tens of thousands, so a 1960s minicomputer could keep up while the analog circuits produced the actual sound.</p>
+
+    <figure>
+      ${grooveSVG()}
+      <figcaption>GROOVE puts both converters from the previous slides into one loop: gesture in through the ADC, control out through the DAC, sound back to the performer's ear.</figcaption>
+    </figure>
+
+    <h2>Performance as "functions of time"</h2>
+    <p>GROOVE recorded everything the performer did as <em>functions of time</em>, streams of sampled control values stored on disk. A take could be played back exactly, slowed down, edited point by point, combined with functions the computer generated, or used as the starting point for another pass in which the performer adjusted only one parameter while the rest played back. This made the musician something closer to a conductor than a player: the computer handled the detail and the human shaped the overall result in real time. Mathews pursued that idea directly in his later Conductor Program and Radio Baton.</p>
+
+    <h2>Laurie Spiegel and the music GROOVE made</h2>
+    <p>The composer most closely associated with GROOVE is <strong>Laurie Spiegel</strong>, who worked on it at Bell Labs through the 1970s. The pieces collected on her album <em>The Expanding Universe</em> (1980) were made with it, slowly evolving music in which she guided algorithmic processes rather than playing every note. Her realisation of Johannes Kepler's <em>Harmonices Mundi</em>, in which the orbital speeds of the planets are mapped to pitch, was included on the Voyager Golden Record launched in 1977. Emmanuel Ghent and other composers also worked on the system. GROOVE ended around the end of the 1970s, when its ageing computer was retired.</p>
+
+    <h2>Closing the loop</h2>
+    <p>GROOVE is a fitting place to bring this storyline to a resting point, because it closes every loop the story opened. Lovelace imagined a machine composing music from symbols. ENIAC's operators watched its state as light, and the first stored-program machines made that state audible. 1-bit music turned timing into tunes. The DAC let the computer compute the waveform itself, and the ADC let it listen. GROOVE connected all of these into one real-time circuit: a human gesture becomes numbers, the numbers become voltage, the voltage becomes sound, and the sound reaches a human ear that responds with the next gesture. At each stage the key component is a transducer, a boundary between two worlds: the piezo crystal, the neon bulb, the voice coil, the DAC and the ADC.</p>
+
+    <div class="callout">
+      <div class="label">Where the story goes next</div>
+      <p style="margin:0">Once fast enough hardware arrived, the audio itself could be computed in real time. John Chowning's FM synthesis at Stanford, licensed to Yamaha, led to the DX7 (1983). Digital samplers such as the Fairlight CMI (1979) put the ADC in the musician's hands. MIDI (1983) standardised the kind of real-time control data that GROOVE had pioneered.</p>
+    </div>
+  `,
+  sources: ["M. V. Mathews & F. R. Moore, \"GROOVE: A Program to Compose, Store, and Edit Functions of Time\", Communications of the ACM 13(12), 1970", "Laurie Spiegel, liner notes to The Expanding Universe (1980; expanded reissue 2012)", "Joel Chadabe, Electric Sound: The Past and Promise of Electronic Music (1997)", "NASA/JPL, contents of the Voyager Golden Record"]
+},
+
 ];
 
 function render() {
@@ -274,6 +566,7 @@ function render() {
     `<li data-i="${i}"><span class="num">${i + 1}</span><span>${s.title.split(":")[0]}</span></li>`
   ).join("");
   document.getElementById("navlist").innerHTML = navHtml;
+  document.getElementById("navfoot").textContent = `${SLIDES.length} slides · scroll or click to jump`;
 
   const main = document.getElementById("main");
   main.innerHTML = SLIDES.map((s, i) => `
@@ -282,10 +575,10 @@ function render() {
       <h1>${s.title}</h1>
       <p class="dek">${s.dek}</p>
       ${s.body}
-      <div class="sources">
+      ${s.sources.length ? `<div class="sources">
         <strong>Sources to verify / cite</strong>
         <ul>${s.sources.map(src => `<li>${src}</li>`).join("")}</ul>
-      </div>
+      </div>` : ""}
       <div class="pager">
         ${i > 0 ? `<button data-go="${i - 1}">← ${SLIDES[i-1].title.split(":")[0]}</button>` : "<span></span>"}
         ${i < SLIDES.length - 1 ? `<button data-go="${i + 1}">${SLIDES[i+1].title.split(":")[0]} →</button>` : "<span></span>"}
@@ -308,6 +601,11 @@ document.getElementById("navlist").addEventListener("click", e => {
 });
 document.getElementById("main").addEventListener("click", e => {
   if (e.target.dataset.go !== undefined) go(+e.target.dataset.go);
+  const pb = e.target.closest("[data-play]");
+  if (pb) {
+    playTune(pb.dataset.play);
+    document.querySelectorAll("[data-play]").forEach(b => b.classList.toggle("on", b === pb && pb.dataset.play !== "stop"));
+  }
 });
 
 render();

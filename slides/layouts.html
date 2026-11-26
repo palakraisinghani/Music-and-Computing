@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listening to the Machine: Slide Layouts</title>
+<link rel="stylesheet" href="global.css">
+<!--
+  LAYOUT SAMPLER: one dummy slide per layout.
+  Copy a <section class="slide …"> block into the real deck and change its text.
+  Pictures: files live in slides/img/ and are named m{movement}-{subject}.{ext}; layout samples use m00-sample-*.
+  Each <figure class="pic"> has a data-id matching its file name.
+  Press E in the browser to drag, resize and crop pictures, then "Copy style" and paste the
+  style="…" attribute onto that <figure>.
+-->
+</head>
+<body>
+<div class="deck">
+
+<!-- ============ 1 · l-title ============ -->
+<section class="slide l-title" data-title="Title" data-transition="iris">
+  <div class="seal" style="right:96px; top:78px" data-anim="fade" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs><path id="sealPath" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs>
+      <circle cx="100" cy="100" r="96" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-width="1"/>
+      <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="1"/>
+      <text><textPath href="#sealPath" textLength="470" lengthAdjust="spacing">MDCCCXLIII · MUSIC &amp; MACHINES · MCMLXXIX ·</textPath></text>
+      <path d="M88 62 V104 Q88 116 100 116 Q112 116 112 104 V62 M100 116 V142" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="cover">
+    <p class="kicker" data-anim="fade" style="--d:.3s">A history in sound &amp; signal</p>
+    <h1 data-anim="ink" style="--d:.5s">Listening to the Machine</h1>
+    <svg class="staff" viewBox="0 0 820 120" data-anim="draw" style="--d:1s" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="1.6" fill="none">
+        <path pathLength="1" d="M0 20 H820"/><path pathLength="1" d="M0 40 H820"/><path pathLength="1" d="M0 60 H820"/>
+        <path pathLength="1" d="M0 80 H820"/><path pathLength="1" d="M0 100 H820"/>
+        <path pathLength="1" d="M410 20 V100" stroke-width="2"/>
+      </g>
+      <g fill="currentColor">
+        <g data-anim="fade" style="--d:1.9s"><ellipse cx="120" cy="90" rx="11" ry="8" transform="rotate(-20 120 90)"/><path d="M130 88 V36" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.1s"><ellipse cx="200" cy="70" rx="11" ry="8" transform="rotate(-20 200 70)"/><path d="M210 68 V16" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.3s"><ellipse cx="280" cy="50" rx="11" ry="8" transform="rotate(-20 280 50)"/><path d="M270 52 V104" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.5s"><ellipse cx="350" cy="60" rx="11" ry="8" transform="rotate(-20 350 60)"/><path d="M340 62 V114" stroke="currentColor" stroke-width="2"/></g>
+        <g data-anim="fade" style="--d:2.7s"><rect x="480" y="58" width="40" height="4"/><rect x="560" y="38" width="40" height="4"/><rect x="640" y="58" width="40" height="4"/><rect x="720" y="38" width="40" height="4"/></g>
+      </g>
+      <text x="476" y="16" font-family="Special Elite, monospace" font-size="11" fill="currentColor" opacity=".7" data-anim="fade" style="--d:2.9s">1 BIT</text>
+    </svg>
+    <p class="subtitle" data-anim="rise" style="--d:1.6s">Music, sound and the making of the computer, 1843–1979</p>
+    <div class="byline" data-anim="fade" style="--d:2.4s">History &amp; Philosophy of Computing · [Your name] · 2026</div>
+  </div>
+  <aside class="notes"><b>Layout: l-title.</b> Cover slide. The seal turns slowly; the staff draws itself, and the right half shows 1-bit "notes" (on/off blocks) against the written notes on the left.</aside>
+</section>
+
+<!-- ============ 2 · l-contents ============ -->
+<section class="slide l-contents" data-title="Contents" data-chapter="Prelude · Contents">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">The storyline</p>
+      <h2 data-anim="ink" style="--d:.3s">Eight Movements</h2>
+      <div class="orn" data-anim="fade" style="--d:.6s">❦</div>
+      <p class="lead" data-anim="rise" style="--d:.8s">From an engine that might compose, to a machine you could play.</p>
+    </div>
+    <ol class="toc">
+      <li data-anim="slide-r" style="--d:.5s"><span class="n">I.</span><span>The Symbolic Engine</span><span class="lead-dots"></span><span class="y">1843</span></li>
+      <li data-anim="slide-r" style="--d:.65s"><span class="n">II.</span><span>Speed Without Memory</span><span class="lead-dots"></span><span class="y">1945</span></li>
+      <li data-anim="slide-r" style="--d:.8s"><span class="n">III.</span><span>Memory Made of Sound</span><span class="lead-dots"></span><span class="y">1947–51</span></li>
+      <li data-anim="slide-r" style="--d:.95s"><span class="n">IV.</span><span>Watching &amp; Listening</span><span class="lead-dots"></span><span class="y">1945–55</span></li>
+      <li data-anim="slide-r" style="--d:1.1s"><span class="n">V.</span><span>Music from Timing</span><span class="lead-dots"></span><span class="y">1950–51</span></li>
+      <li data-anim="slide-r" style="--d:1.25s"><span class="n">VI.</span><span>Computing the Wave</span><span class="lead-dots"></span><span class="y">1957</span></li>
+      <li data-anim="slide-r" style="--d:1.4s"><span class="n">VII.</span><span>Teaching the Machine to Listen</span><span class="lead-dots"></span><span class="y">1928–70s</span></li>
+      <li data-anim="slide-r" style="--d:1.55s"><span class="n">VIII.</span><span>Closing the Loop</span><span class="lead-dots"></span><span class="y">1968–79</span></li>
+    </ol>
+  </div>
+  <aside class="notes"><b>Layout: l-contents.</b> Book-style contents with dotted leaders. The chapters are called "movements" to keep the musical framing.</aside>
+</section>
+
+<!-- ============ 3 · l-chapter ============ -->
+<section class="slide l-chapter dark no-runner" data-title="Movement II: Speed Without Memory" data-transition="iris">
+  <div class="card">
+    <div class="chapter-no" data-anim="fade" style="--d:.3s">Movement II</div>
+    <div class="year" data-anim="type" style="--d:.7s; --speed:160ms">1945</div>
+    <h2 data-anim="ink" style="--d:1.6s">Speed Without Memory</h2>
+    <div class="orn center" data-anim="fade" style="--d:2s">❦</div>
+    <p class="dek" data-anim="rise" style="--d:2.2s">The first large electronic computer could add five thousand numbers a second, and remember only twenty of them.</p>
+  </div>
+  <aside class="notes"><b>Layout: l-chapter (dark).</b> A title card between movements. The year types itself out; the iris transition recalls early cinema.</aside>
+</section>
+
+<!-- ============ 4 · l-split (picture right) ============ -->
+<section class="slide l-split" data-title="Lovelace: music as symbols" data-chapter="Movement I · The Symbolic Engine">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">1843 · Note A</p>
+      <h2 data-anim="ink" style="--d:.2s">Music as a Formal System</h2>
+      <p class="dropcap" data-anim="rise" style="--d:.5s">Lovelace saw that the engine's real subject was not number but the <em>relations</em> between symbols, and music gave her the clearest proof.</p>
+      <ul class="list">
+        <li class="step">A finite alphabet: twelve pitch classes, a handful of durations</li>
+        <li class="step">Explicit rules: harmony, counterpoint, metre</li>
+        <li class="step">So composing becomes a search through legal combinations</li>
+      </ul>
+    </div>
+    <figure data-id="m00-sample-lovelace-portrait" class="pic mount kenburns" data-anim="fade" style="--d:.4s; --fy:30%" data-label="Portrait of Ada Lovelace (Alfred Edward Chalon, c. 1840)">
+      <figcaption><span class="figno">Fig. 1</span>Ada Lovelace, c. 1840.</figcaption>
+    </figure>
+  </div>
+  <aside class="notes"><b>Layout: l-split.</b> Text left, mounted photograph right with a slow Ken Burns drift. The three bullets are builds: press → to reveal each. Change the column ratio with style="--split: 1.2fr 1fr" on the section.</aside>
+</section>
+
+<!-- ============ 5 · l-split.flip (picture left) ============ -->
+<section class="slide l-split flip" data-title="ENIAC: programs as wiring" data-chapter="Movement II · Speed Without Memory" style="--split: 1fr 1.15fr">
+  <div class="content">
+    <div class="text">
+      <p class="kicker" data-anim="fade">Moore School, Philadelphia</p>
+      <h2 data-anim="ink" style="--d:.2s">Reprogramming Meant Rewiring</h2>
+      <p data-anim="rise" style="--d:.5s">ENIAC had no stored program. Its "program" was a physical arrangement of patch cables and rotary switches, and changing the problem could take days of replugging.</p>
+      <p class="small" data-anim="rise" style="--d:.7s">Twenty accumulators, ten decimal digits each: about 200 digits of working state in total.</p>
+    </div>
+    <figure data-id="m00-sample-eniac-programmers" class="pic corners" data-anim="slide-l" style="--d:.3s" data-label="ENIAC programmers at the function tables, c. 1946 (U.S. Army photograph)">
+      <figcaption><span class="figno">Fig. 2</span>Setting up a problem by hand.</figcaption>
+    </figure>
+  </div>
+  <aside class="notes"><b>Layout: l-split.flip.</b> Same as l-split with the picture on the left. Album photo corners frame.</aside>
+</section>
+
+<!-- ============ 6 · l-bleed ============ -->
+<section class="slide l-bleed no-runner" data-title="Debugging by eye" data-chapter="Movement IV · Watching & Listening">
+  <figure data-id="m00-sample-eniac-panels" class="pic bleed plain kenburns" style="--kb-x:-3%; --kb-y:-2%" data-label="ENIAC accumulator panels with their neon indicator lamps — full-frame photograph">
+  </figure>
+  <div class="sprockets left"></div><div class="sprockets right"></div>
+  <div class="band">
+    <p class="kicker" data-anim="fade" style="--d:.8s">1945 – 1955 · Movement IV</p>
+    <h2 data-anim="ink" style="--d:1.1s">Reading the Machine's Mind by Flicker</h2>
+    <p data-anim="rise" style="--d:1.5s">Ten neon bulbs per digit, one lit at a time: operators learned the rhythm of a healthy calculation and noticed when it broke.</p>
+  </div>
+  <aside class="notes"><b>Layout: l-bleed.</b> Full-frame archival photograph with a caption band and optional film-strip edges (delete the two .sprockets divs to remove them). Best with a large landscape image, at least 1600 × 900.</aside>
+</section>
+
+<!-- ============ 7 · l-quote ============ -->
+<section class="slide l-quote" data-title="Lovelace, Note A" data-chapter="Movement I · The Symbolic Engine">
+  <div class="content">
+    <figure data-id="m00-sample-lovelace-cameo" class="pic oval" data-anim="iris" style="--d:.2s" data-kind="Portrait" data-label="Ada Lovelace (cameo crop)">
+    </figure>
+    <blockquote>
+      <p data-anim="ink" style="--d:.7s">“…the engine might compose elaborate and scientific pieces of music of any degree of complexity or extent.”</p>
+      <cite data-anim="fade" style="--d:1.4s">— Ada Lovelace, Notes on the Analytical Engine, Note A, 1843</cite>
+    </blockquote>
+  </div>
+  <aside class="notes"><b>Layout: l-quote.</b> Brass cameo portrait with a pull quote. Drag inside the oval in edit mode (E) to centre the face.</aside>
+</section>
+
+<!-- ============ 8 · l-timeline ============ -->
+<section class="slide l-timeline" data-title="A century in seven dates" data-chapter="Prelude · Chronology">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Chronology</p>
+    <h2 data-anim="ink" style="--d:.2s">A Century in Seven Dates</h2>
+    <div class="timeline">
+      <div class="tl-ev up"   data-anim="rise" style="--at:4%;  --d:.6s"><div class="tl-card"><span class="tl-year">1843</span><span class="tl-text">Lovelace's Notes: an engine that might compose</span></div><span class="tl-dot"></span></div>
+      <span class="tl-break" style="--at:12%"></span>
+      <div class="tl-ev down" data-anim="rise" style="--at:20%; --d:.8s"><span class="tl-dot"></span><div class="tl-card"><span class="tl-year">1945</span><span class="tl-text">ENIAC: fast, but no memory</span></div></div>
+      <div class="tl-ev up"   data-anim="rise" style="--at:34%; --d:1s"><div class="tl-card"><span class="tl-year">1949</span><span class="tl-text">EDSAC stores bits as sound in mercury</span></div><span class="tl-dot"></span></div>
+      <div class="tl-ev down" data-anim="rise" style="--at:48%; --d:1.2s"><span class="tl-dot"></span><div class="tl-card"><span class="tl-year">1951</span><span class="tl-text">CSIRAC &amp; Ferranti Mark 1 play tunes</span></div></div>
+      <div class="tl-ev up"   data-anim="rise" style="--at:63%; --d:1.4s"><div class="tl-card"><span class="tl-year">1957</span><span class="tl-text">MUSIC I: the waveform is computed</span></div><span class="tl-dot"></span></div>
+      <div class="tl-ev down" data-anim="rise" style="--at:78%; --d:1.6s"><span class="tl-dot"></span><div class="tl-card"><span class="tl-year">1961</span><span class="tl-text">An IBM 7094 sings "Daisy Bell"</span></div></div>
+      <div class="tl-ev up"   data-anim="rise" style="--at:94%; --d:1.8s"><div class="tl-card"><span class="tl-year">1970</span><span class="tl-text">GROOVE: playing a computer in real time</span></div><span class="tl-dot"></span></div>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-timeline.</b> Each event sets its position with --at (0–100%) and alternates .up / .down. The broken-axis mark (.tl-break) shows the jump from 1843 to 1945.</aside>
+</section>
+
+<!-- ============ 9 · l-compare ============ -->
+<section class="slide l-compare" data-title="One bit versus many" data-chapter="Movement VI · Computing the Wave">
+  <div class="content">
+    <p class="kicker" data-anim="fade">1951 → 1957</p>
+    <h2 data-anim="ink" style="--d:.2s">One Bit versus Many</h2>
+    <div class="cols">
+      <div class="col" data-anim="slide-l" style="--d:.5s">
+        <h3>The 1-bit speaker</h3>
+        <ul class="list">
+          <li>Pitch comes only from timing</li>
+          <li>Always a square wave: fixed, buzzy timbre</li>
+          <li>One note at a time</li>
+          <li>Real time, because keeping time is its whole job</li>
+        </ul>
+      </div>
+      <div class="col" data-anim="slide-r" style="--d:.8s">
+        <h3>The DAC</h3>
+        <ul class="list">
+          <li>Any waveform, computed sample by sample</li>
+          <li>4,096 levels from 12 bits</li>
+          <li>Any number of voices, any timbre</li>
+          <li>But every sample must be calculated first</li>
+        </ul>
+      </div>
+    </div>
+    <p class="verdict" data-anim="fade" style="--d:1.4s">From playing the machine like a metronome to asking it to calculate the sound itself.</p>
+  </div>
+  <aside class="notes"><b>Layout: l-compare.</b> Two columns divided by a double rule, with a one-line verdict underneath.</aside>
+</section>
+
+<!-- ============ 10 · l-plate ============ -->
+<section class="slide l-plate" data-title="Plate: the mercury delay line" data-chapter="Movement III · Memory Made of Sound">
+  <div class="content">
+    <div class="plate" data-anim="fade" style="--d:.1s">
+      <div class="plate-head"><span>Plate III</span><span class="t">The Mercury Acoustic Delay Line</span><span>Fig. 1</span></div>
+      <svg viewBox="0 0 1180 430" data-anim="draw" style="--d:.4s" role="img" aria-label="Engraving-style diagram of a mercury delay line: quartz crystals at each end of a mercury column, acoustic pulses inside, and an amplifier feeding the signal back">
+        <defs>
+          <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="9" stroke="currentColor" stroke-width="1" opacity=".35"/>
+          </pattern>
+          <marker id="ah" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker>
+        </defs>
+        <rect x="210" y="130" width="760" height="120" rx="14" fill="url(#hatch)" data-anim="fade" style="--d:1.2s"/>
+        <rect class="ink" pathLength="1" x="210" y="130" width="760" height="120" rx="14"/>
+        <rect class="ink" pathLength="1" x="176" y="112" width="34" height="156" style="fill:var(--bg)"/>
+        <rect class="ink" pathLength="1" x="970" y="112" width="34" height="156" style="fill:var(--bg)"/>
+        <path class="wave" pathLength="1" d="M330 150 Q352 190 330 230"/>
+        <path class="wave" pathLength="1" d="M380 150 Q402 190 380 230"/>
+        <path class="wave" pathLength="1" d="M560 150 Q582 190 560 230"/>
+        <path class="wave" pathLength="1" d="M680 150 Q702 190 680 230"/>
+        <path class="wave" pathLength="1" d="M730 150 Q752 190 730 230"/>
+        <path class="wave" pathLength="1" d="M850 150 Q872 190 850 230"/>
+        <path class="ink" pathLength="1" d="M987 268 V340 H672" marker-end="url(#ah)"/>
+        <rect class="ink" pathLength="1" x="500" y="312" width="180" height="56"/>
+        <text class="cap" x="590" y="346" text-anchor="middle">AMP · RETIME</text>
+        <path class="ink" pathLength="1" d="M500 340 H193 V276" marker-end="url(#ah)"/>
+        <path class="ink" pathLength="1" d="M1004 190 H1090" marker-end="url(#ah)"/>
+        <text class="cap" x="1096" y="196">OUT</text>
+        <path class="ink" pathLength="1" d="M90 190 H170" marker-end="url(#ah)"/>
+        <text class="cap" x="40" y="196">IN</text>
+        <path class="fine" pathLength="1" d="M193 112 L160 60"/><text class="lbl" x="140" y="52">a</text>
+        <path class="fine" pathLength="1" d="M470 130 L500 70"/><text class="lbl" x="500" y="60">b</text>
+        <path class="fine" pathLength="1" d="M690 150 L720 70"/><text class="lbl" x="720" y="60">c</text>
+        <path class="fine" pathLength="1" d="M987 112 L1020 60"/><text class="lbl" x="1024" y="52">d</text>
+        <path class="fine" pathLength="1" d="M680 368 L710 404"/><text class="lbl" x="714" y="424">e</text>
+        <g class="fine"><path pathLength="1" d="M210 405 H460"/><path pathLength="1" d="M210 398 V412 M272 400 V410 M335 398 V412 M397 400 V410 M460 398 V412"/></g>
+        <text class="cap" x="216" y="390">SCALE ≈ 1 METRE</text>
+      </svg>
+      <p class="plate-legend" data-anim="fade" style="--d:2.4s"><b>a</b>, transmitting quartz crystal; <b>b</b>, column of mercury; <b>c</b>, acoustic pulses in transit; <b>d</b>, receiving crystal; <b>e</b>, amplifier and re-timer feeding the train back in.</p>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-plate.</b> An engraved scientific plate for diagrams. Give any SVG stroke pathLength="1" and put data-anim="draw" on the &lt;svg&gt;, and it draws itself line by line.</aside>
+</section>
+
+<!-- ============ 11 · l-collage ============ -->
+<section class="slide l-collage" data-title="Manchester, 1951" data-chapter="Movement V · Music from Timing">
+  <div class="content">
+    <figure data-id="m00-sample-ferranti-mark1" class="pic free tape" data-anim="fade" style="--x:20px; --y:30px; --w:560px; --h:420px; --rot:-3deg; --d:.3s" data-label="Ferranti Mark 1 console, Manchester, 1951">
+      <figcaption>The Ferranti Mark 1, Manchester.</figcaption>
+    </figure>
+    <figure data-id="m00-sample-strachey" class="pic free corners" data-anim="fade" style="--x:640px; --y:120px; --w:360px; --h:460px; --rot:2.5deg; --d:.6s" data-kind="Portrait" data-label="Christopher Strachey">
+      <figcaption>Christopher Strachey.</figcaption>
+    </figure>
+    <figure data-id="m00-sample-bbc-acetate" class="pic free mount" data-anim="fade" style="--x:1070px; --y:10px; --w:350px; --h:350px; --rot:4deg; --d:.9s" data-kind="Artefact" data-label="BBC acetate disc of the 1951 recording">
+    </figure>
+    <p class="note-hand" data-anim="ink" style="left:40px; top:530px; --d:1.3s">Recorded by the BBC, autumn 1951:<br>the anthem, “Baa Baa Black Sheep”,<br>and a little of “In the Mood”.</p>
+    <div style="position:absolute; left:1070px; top:420px; width:380px; --d:1.5s" data-anim="rise">
+      <p class="kicker">1951</p>
+      <h2 style="font-size:50px">The Oldest Recording</h2>
+      <span class="stamp" style="--rot:-5deg" data-anim="stamp">Restored 2016</span>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-collage.</b> Free-placed pictures (class "free"). Each takes --x, --y, --w, --h and --rot. Press E and drag them around, resize from the corner, then copy the style.</aside>
+</section>
+
+<!-- ============ 12 · l-specimen ============ -->
+<section class="slide l-specimen" data-title="Specimen: a delay-line tank" data-chapter="Movement III · Memory Made of Sound">
+  <div class="content">
+    <figure data-id="m00-sample-mercury-tank" class="pic mount" data-anim="fade" style="--d:.2s" data-kind="Artefact" data-label="Mercury delay-line tank from EDSAC (museum photograph)">
+      <figcaption><span class="figno">Fig. 4</span>A tank of the kind that held EDSAC's memory.</figcaption>
+    </figure>
+    <div class="catalog-card" data-anim="slide-r" style="--d:.5s">
+      <div class="cc-head">Mercury Delay-Line Tank</div>
+      <dl>
+        <dt>Object no.</dt><dd>[accession no.]</dd>
+        <dt>Date</dt><dd>c. 1949</dd>
+        <dt>Made for</dt><dd>EDSAC, Cambridge</dd>
+        <dt>Materials</dt><dd>steel, mercury, quartz</dd>
+        <dt>Stored</dt><dd>bits as sound in transit</dd>
+        <dt>Held at</dt><dd>[museum / collection]</dd>
+      </dl>
+      <span class="stamp" data-anim="stamp" style="--d:1.4s; --rot:-9deg">Catalogued</span>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-specimen.</b> An artefact photograph with a museum catalogue card. Replace the bracketed fields with real details from the object's collection record.</aside>
+</section>
+
+<!-- ============ 13 · l-bignum ============ -->
+<section class="slide l-bignum" data-title="17,468 vacuum tubes" data-chapter="Movement II · Speed Without Memory">
+  <div class="content">
+    <p class="kicker" data-anim="fade">ENIAC, by the numbers</p>
+    <div class="bignum" data-count="17468" data-dur="2400" data-delay="300">17,468</div>
+    <div class="bignum-label" data-anim="rise" style="--d:.6s">vacuum tubes, and any one of them could fail.</div>
+    <div class="facts" data-anim="rise" style="--d:1.4s">
+      <div><b>20</b><span>accumulators</span></div>
+      <div><b>≈ 150 kW</b><span>of power</span></div>
+      <div><b>≈ 27 t</b><span>in weight</span></div>
+      <div><b>5,000</b><span>additions / second</span></div>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-bignum.</b> One striking figure that counts up when the slide opens (data-count), with supporting facts underneath.</aside>
+</section>
+
+<!-- ============ 14 · l-demo ============ -->
+<section class="slide l-demo" data-title="Live: listening to a program" data-chapter="Movement IV · Watching & Listening">
+  <div class="content">
+    <div class="apparatus" data-anim="fade" style="--d:.2s">
+      <span class="plate-name">Apparatus № 1</span>
+      <div class="screen" style="--iz:.62"><iframe data-src="demos/transducer_simulator.html" title="Listening to a Program simulator"></iframe></div>
+    </div>
+    <div class="text">
+      <p class="kicker" data-anim="fade" style="--d:.4s">Demonstration</p>
+      <h2 data-anim="ink" style="--d:.6s; font-size:52px">Listening to a Program</h2>
+      <ul class="list manicule" data-anim="rise" style="--d:1s">
+        <li>Run "Stuck loop" and hear it hum forever</li>
+        <li>Switch the speaker to bit 0 of register A</li>
+        <li>Slow the machine down and watch each pulse</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-demo.</b> A live simulation in a brass-and-bakelite frame. It only loads when the slide opens. Change --iz on .screen to zoom the page inside the frame.</aside>
+</section>
+
+<!-- ============ 15 · l-index ============ -->
+<section class="slide l-index" data-title="Sources" data-chapter="Coda · Sources">
+  <div class="content">
+    <p class="kicker" data-anim="fade">Card catalogue</p>
+    <h2 data-anim="ink" style="--d:.2s">Sources</h2>
+    <div class="cards">
+      <div class="index-card" data-anim="rise" style="--d:.4s; --rot:-1deg"><div class="ic-head">Lovelace, A. A. (1843)</div>Notes to L. F. Menabrea, "Sketch of the Analytical Engine". Taylor's Scientific Memoirs, vol. 3.</div>
+      <div class="index-card" data-anim="rise" style="--d:.6s; --rot:.8deg"><div class="ic-head">Mathews, M. V. (1963)</div>"The Digital Computer as a Musical Instrument". Science 142, 553–557.</div>
+      <div class="index-card" data-anim="rise" style="--d:.8s; --rot:.5deg"><div class="ic-head">Doornbusch, P. (2005)</div>The Music of CSIRAC: Australia's First Computer Music. Common Ground.</div>
+      <div class="index-card" data-anim="rise" style="--d:1s; --rot:-.7deg"><div class="ic-head">Mathews &amp; Moore (1970)</div>"GROOVE: A Program to Compose, Store, and Edit Functions of Time". CACM 13(12).</div>
+    </div>
+  </div>
+  <aside class="notes"><b>Layout: l-index.</b> Bibliography as ruled library index cards; --rot tilts each card slightly.</aside>
+</section>
+
+<!-- ============ 16 · l-end ============ -->
+<section class="slide l-end dark no-runner" data-title="Fin" data-transition="iris">
+  <div class="card">
+    <div class="fin" data-anim="ink" style="--d:.4s">Fin.</div>
+    <div class="orn center" data-anim="fade" style="--d:1s">❦</div>
+    <p class="lead" data-anim="rise" style="--d:1.2s; color: rgba(236,224,195,.85)">Questions &amp; discussion</p>
+    <p class="typed small" data-anim="type" style="--d:2s; --speed:45ms">Listening to the Machine · History &amp; Philosophy of Computing</p>
+  </div>
+  <aside class="notes"><b>Layout: l-end (dark).</b> Closing card.</aside>
+</section>
+
+</div>
+<script src="deck.js"></script>
+</body>
+</html>

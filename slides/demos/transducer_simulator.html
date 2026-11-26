@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listening to a Program — transducer simulator</title>
+<style>
+  :root {
+    --bg: #faf8f3; --panel: #f1ede3; --card: #fffdf9; --ink: #2a2520; --muted: #786f60;
+    --line: #e2dcca; --accent: #8a5a2b; --red: #d64537;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 22px 24px 40px; }
+  h1 { font: 600 24px/1.3 "Iowan Old Style", Georgia, serif; margin: 0 0 2px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-family: "Iowan Old Style", Georgia, serif; font-style: italic; }
+
+  .controls { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: flex-end; }
+  .controls label.f { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  select, button, input { font: 14px -apple-system, Helvetica, sans-serif; color: var(--ink); }
+  select, input[type=number] { padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); max-width: 320px; }
+  button { padding: 7px 14px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 84px; }
+  .btns { display: flex; gap: 8px; }
+  .chk { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink); }
+  .speed { display: flex; align-items: center; gap: 8px; }
+  #rateOut { font-variant-numeric: tabular-nums; min-width: 104px; color: var(--ink); font-size: 13px; text-transform: none; letter-spacing: 0; }
+
+  .desc { margin: 12px 2px; color: #4a4336; font-family: "Iowan Old Style", Georgia, serif; font-size: 16px; min-height: 24px; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: 68vh; min-height: 480px; }
+  .pane { background: var(--card); border: 1px solid var(--line); border-radius: 6px; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .pane > h2 { margin: 0; padding: 8px 12px; font: 600 12px -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; }
+  .tabs { display: flex; gap: 4px; }
+  html.only-code .tabs { display: none; }
+  .tab { padding: 4px 14px; font-size: 13px; }
+  .tab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* code view */
+  #listing { flex: 1; overflow: auto; padding: 8px 0; position: relative; font: 13.5px/1.65 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .ln { display: flex; padding: 0 14px 0 0; white-space: pre; border-left: 4px solid transparent; }
+  .ln .no { width: 40px; text-align: right; padding-right: 14px; color: #b5ac98; user-select: none; flex: none; }
+  .ln .cm { color: #9a9180; }
+  .ln.cur { background: rgba(214,69,55,.92) !important; color: #fff; border-left-color: #8e2a20; }
+  .ln.cur .no, .ln.cur .cm { color: rgba(255,255,255,.8); }
+  #editor { flex: 1; border: 0; padding: 10px 14px; font: 13.5px/1.65 ui-monospace, "SF Mono", Menlo, monospace; background: var(--card); color: var(--ink); resize: none; outline: none; display: none; }
+  #err { color: #9b2c20; font-size: 13px; padding: 6px 14px; border-top: 1px solid var(--line); display: none; white-space: pre-wrap; }
+  details.ref { border-top: 1px solid var(--line); padding: 8px 14px; font-size: 13px; color: var(--muted); }
+  details.ref summary { cursor: pointer; }
+  details.ref code { font-family: ui-monospace, Menlo, monospace; color: var(--ink); }
+  details.ref div { display: grid; grid-template-columns: 110px 1fr; gap: 2px 10px; margin-top: 6px; }
+
+  /* blocks view */
+  #blocksView { flex: 1; overflow: auto; padding: 10px 12px 24px; }
+  .btool { display: flex; gap: 8px 12px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .btool input { width: 72px; padding: 4px 6px; }
+  .btool button { padding: 4px 10px; font-size: 13px; }
+  .hint { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .blk { border: 1px solid var(--line); border-left: 4px solid #c9a66b; border-radius: 5px; background: #fff; margin: 6px 0; }
+  .blk-rest { border-left-color: #c8c0ab; }
+  .blk-drum { border-left-color: #6b7f8e; }
+  .blk-repeat, .blk-forever { border-left-color: var(--accent); background: #fbf8f1; }
+  .blk-halt { border-left-color: #9b2c20; }
+  .bh { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; padding: 6px 8px; font-size: 13px; border-radius: 4px; }
+  .bt { font-weight: 600; min-width: 74px; }
+  .bh select, .bh input { font-size: 13px; padding: 3px 5px; }
+  .bh input[type=number] { width: 72px; }
+  .info { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .bctl { margin-left: auto; display: flex; gap: 1px; }
+  .bctl button { padding: 1px 6px; font-size: 12px; border-color: transparent; background: transparent; color: var(--muted); }
+  .bctl button:hover { color: var(--ink); }
+  .kids { padding: 2px 8px 8px 18px; border-top: 1px dashed var(--line); }
+  .add { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; font-size: 12px; color: var(--muted); align-items: center; }
+  .add button { padding: 2px 8px; font-size: 12px; }
+  .blk.playing > .bh { background: rgba(214,69,55,.9); color: #fff; }
+  .blk.playing > .bh .info, .blk.playing > .bh .bctl button { color: rgba(255,255,255,.85); }
+  .blk.inside { border-color: rgba(214,69,55,.55); }
+  .pass { font-size: 12px; color: var(--red); font-weight: 600; }
+  .emptymsg { color: var(--muted); padding: 24px 8px; font-family: Georgia, serif; }
+  .emptymsg button { margin-top: 10px; }
+
+  /* graph pane */
+  .gwrap { flex: 1; min-height: 0; position: relative; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .readout { display: flex; gap: 10px 16px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .regs { display: flex; gap: 5px; flex-wrap: wrap; }
+  .reg { border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; font: 12px ui-monospace, Menlo, monospace; background: var(--bg); min-width: 52px; }
+  .reg b { color: var(--accent); margin-right: 4px; }
+  #pitch { font: 600 18px "Iowan Old Style", Georgia, serif; min-width: 190px; }
+  #pitch small { font: 12px -apple-system, sans-serif; color: var(--muted); font-weight: 400; }
+  #cone { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+  #cone.on { background: var(--red); border-color: var(--red); }
+  #status { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .note { margin-top: 14px; font-size: 13px; color: var(--muted); max-width: 940px; }
+
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; height: auto; } .pane { height: 60vh; min-height: 400px; } }
+</style>
+<link rel="stylesheet" href="../demo-theme.css">
+</head>
+<body>
+<div class="wrap">
+  <h1>Listening to a Program</h1>
+  <p class="sub">A loudspeaker wired to an early computer. Build music out of loops, watch the machine step through them, and hear what the speaker hears.</p>
+
+  <div class="controls">
+    <label class="f">Program
+      <select id="preset"></select>
+    </label>
+    <label class="f">Machine speed
+      <span class="speed">
+        <select id="machine">
+          <option value="600">EDSAC ≈ 600 instr/s</option>
+          <option value="1000">CSIRAC ≈ 1,000 instr/s</option>
+          <option value="4000">Faster (4,000 instr/s)</option>
+          <option value="16000">Music mode (16,000 instr/s)</option>
+          <option value="8">Slow motion (8 instr/s)</option>
+          <option value="custom">Custom…</option>
+        </select>
+        <input type="range" id="rate" min="0" max="100" value="80" aria-label="Instructions per second">
+        <span id="rateOut"></span>
+      </span>
+    </label>
+    <label class="f">Speaker wired to
+      <select id="tap">
+        <option value="hoot">the HOOT instruction</option>
+        <option value="bit">bit 0 of register A</option>
+      </select>
+    </label>
+    <div class="btns">
+      <button class="primary" id="runBtn">▶ Run</button>
+      <button id="stepBtn">Step</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="sound" checked> Sound</label>
+    <label class="chk"><input type="checkbox" id="repeat"> Restart at HALT</label>
+  </div>
+
+  <p class="desc" id="desc"></p>
+
+  <div class="split">
+    <section class="pane">
+      <h2>
+        <span class="tabs"><button class="tab" data-tab="blocks">Blocks</button><button class="tab" data-tab="code">Code</button></span>
+        <button id="editBtn">Edit source</button>
+      </h2>
+      <div id="blocksView"></div>
+      <div id="listing"></div>
+      <textarea id="editor" spellcheck="false"></textarea>
+      <div id="err"></div>
+      <details class="ref"><summary>Instruction set (what blocks turn into)</summary>
+        <div>
+          <code>SET r,n</code><span>load the number n into register r (A–H)</span>
+          <code>MOV r,s</code><span>copy register s into r</span>
+          <code>ADD r,x</code><span>add x (a number or register) to r</span>
+          <code>SUB r,x</code><span>subtract x (a number or register) from r</span>
+          <code>DEC r</code><span>subtract 1 from r</span>
+          <code>JNZ r,label</code><span>jump to label if r is not zero (a branch)</span>
+          <code>JGT r,label</code><span>jump to label if r is greater than zero</span>
+          <code>JMP label</code><span>jump to label always</span>
+          <code>CALL label</code><span>run the subroutine at label, then come back</span>
+          <code>RET</code><span>return from a subroutine</span>
+          <code>SLEEP n</code><span>stay silent for n instruction-times (rests and beats)</span>
+          <code>HOOT</code><span>pulse the speaker once (when wired to HOOT)</span>
+          <code>NOP / HALT</code><span>do nothing / stop</span>
+        </div>
+      </details>
+    </section>
+
+    <section class="pane">
+      <h2>Pitch heard from the speaker</h2>
+      <div class="gwrap"><canvas id="graph"></canvas></div>
+      <div class="readout">
+        <span id="cone" title="Speaker cone"></span>
+        <span id="pitch">—</span>
+        <div class="regs" id="regs"></div>
+        <span id="status">Ready</span>
+      </div>
+    </section>
+  </div>
+
+  <p class="note">Every note is a loop. One trip round the loop pulses the speaker once, so pitch = machine speed ÷ loop length: a 61-instruction loop on a 16,000 instr/s machine gives ≈ 262 Hz (middle C), and a 122-instruction loop gives the C an octave below. A <b>Repeat</b> block becomes a counter and a backward branch (<code>DEC</code> + <code>JNZ</code>); a <b>Forever</b> block is a plain backward <code>JMP</code>; rests are <code>SLEEP</code>s, and the silences between notes are what make rhythm. Change the machine speed and every loop keeps its length but its pitch moves, exactly as it would on real hardware. Speeds are approximate; verify them before citing.</p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+/* =================================================================
+   Code examples (written directly in assembly)
+   ================================================================= */
+const ASM_PRESETS = [
+{ name: "One tight loop — a steady tone", tap: "hoot", rate: 1000,
+  desc: "A single loop of four instructions pulses the speaker once per trip. The pitch never changes, because the loop never changes length.",
+  src: `; one tight loop: the speaker is pulsed every 4 instructions
+      SET A,1
+loop: HOOT          ; click the speaker
+      NOP
+      NOP
+      JMP loop      ; go round again
+` },
+{ name: "Rising scale — nested loops", tap: "hoot", rate: 1000,
+  desc: "The outer loop plays a note by repeating an inner pulse loop; each time round, the delay loop gets shorter, so the pitch steps up.",
+  src: `; each note = a block of pulses; a shorter delay loop gives a higher pitch
+      SET C,8        ; eight notes
+      SET B,9        ; delay length for the first note (longest = lowest)
+note: SET A,60       ; pulses in this note
+pulse: HOOT
+      MOV D,B
+wait: DEC D          ; delay loop, runs B times
+      JNZ D,wait
+      DEC A
+      JNZ A,pulse    ; branch back until the note is finished
+      DEC B          ; shorter delay -> higher pitch
+      DEC C
+      JNZ C,note     ; next note
+      HALT
+` },
+{ name: "Branching — two alternating tones", tap: "hoot", rate: 1000, repeat: true,
+  desc: "The program alternates between a longer loop (low tone) and a shorter loop (high tone). You can hear which branch is running.",
+  src: `; alternate between a slow loop (low tone) and a fast loop (high tone)
+      SET C,6
+top:  SET A,30
+low:  HOOT
+      NOP
+      NOP
+      NOP
+      DEC A
+      JNZ A,low      ; 7-instruction loop: low pitch
+      SET A,60
+high: HOOT
+      DEC A
+      JNZ A,high     ; 3-instruction loop: high pitch
+      DEC C
+      JNZ C,top
+      HALT
+` },
+{ name: "Counting — speaker follows a register bit", tap: "bit", rate: 1000,
+  desc: "Here the speaker is wired to the lowest bit of register A. Counting up flips that bit on every pass, so the arithmetic itself sings.",
+  src: `; speaker follows bit 0 of A: counting up flips it every pass
+      SET A,0
+      SET C,300
+loop: ADD A,1        ; the speaker follows the lowest bit of A
+      DEC C
+      JNZ C,loop
+      HALT
+` },
+{ name: "Debugging by ear — a bug you can hear", tap: "hoot", rate: 1000,
+  desc: "This should play five pulses and stop, but A is never decremented, so it hums forever: the sound of a stuck loop. Fix it by adding DEC A before the JNZ.",
+  src: `; intended: play 5 pulses, then stop. Bug: A is never decremented.
+      SET A,5
+loop: HOOT
+      JNZ A,loop     ; BUG: forgot DEC A -> loops forever
+      HALT           ; never reached
+` },
+];
+
+/* =================================================================
+   Block songs
+   ================================================================= */
+let nextId = 1;
+const nid = () => "b" + (nextId++);
+const NOTE_IDX = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+function PITCH(name) {                    // "C4", "F#3" -> Hz
+  const m = name.match(/^([A-G])(#?)(\d)$/);
+  const midi = (+m[3] + 1) * 12 + NOTE_IDX[m[1]] + (m[2] ? 1 : 0);
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+const SHARPS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const PITCHES = [];
+for (let m = 43; m <= 79; m++) PITCHES.push(SHARPS[m % 12] + (Math.floor(m / 12) - 1));   // G2 .. G5
+const BEATS = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6];
+const FRAC = { 0.25: "¼", 0.5: "½", 0.75: "¾", 1.5: "1½" };
+const fmtBeats = x => (FRAC[x] || x) + (x > 1 ? " beats" : " beat");
+const DRUMS = {
+  kick:  { f: 53,   sec: 0.15, label: "Kick (low thump)" },
+  snare: { f: 570,  sec: 0.12, label: "Snare (crack)" },
+  hat:   { f: 1330, sec: 0.04, label: "Hi-hat (tick)" },
+};
+const CREG = ["C", "E", "F", "G", "H"];   // counter register for each level of Repeat nesting
+const BASE_RATE = 16000;
+
+const N = (p, beats = 1) => ({ id: nid(), type: "note", loop: Math.round(BASE_RATE / PITCH(p)), beats });
+const R = (beats = 1) => ({ id: nid(), type: "rest", beats });
+const D = (kind, beats = 1) => ({ id: nid(), type: "drum", kind, beats });
+const REP = (times, ...kids) => ({ id: nid(), type: "repeat", times, children: kids.flat() });
+const FOREVER = (...kids) => ({ id: nid(), type: "forever", children: kids.flat() });
+const HALTB = () => ({ id: nid(), type: "halt" });
+const mel = s => s.split(",").map(t => t.trim()).filter(Boolean).map(t => {
+  const [p, b] = t.split(/\s+/); return p === "R" ? R(b ? +b : 1) : N(p, b ? +b : 1);
+});
+
+const BLOCK_SONGS = [
+{ name: "Twinkle Twinkle — a Repeat in the middle", bpm: 140,
+  desc: "The middle line (\"Up above the world so high / Like a diamond in the sky\") is the same tune twice, so it sits inside a Repeat ×2 block. Watch the pass counter tick.",
+  build: () => [
+    ...mel("C4,C4,G4,G4,A4,A4,G4 2,F4,F4,E4,E4,D4,D4,C4 2"),
+    REP(2, mel("G4,G4,F4,F4,E4,E4,D4 2")),
+    ...mel("C4,C4,G4,G4,A4,A4,G4 2,F4,F4,E4,E4,D4,D4,C4 2"),
+  ] },
+{ name: "Frère Jacques — every phrase repeated", bpm: 120,
+  desc: "Each phrase of the round is sung twice, so the whole song is four Repeat ×2 blocks. Each one compiles to a counter register and a backward branch.",
+  build: () => [
+    REP(2, mel("C4,D4,E4,C4")),
+    REP(2, mel("E4,F4,G4 2")),
+    REP(2, mel("G4 .5,A4 .5,G4 .5,F4 .5,E4,C4")),
+    REP(2, mel("C4,G3,C4 2")),
+  ] },
+{ name: "Ode to Joy — Beethoven", bpm: 132,
+  desc: "Nothing but notes: a straight run of loops of different lengths. The only variety is the size of each loop and how long it runs.",
+  build: () => mel("E4,E4,F4,G4,G4,F4,E4,D4,C4,C4,D4,E4,E4 1.5,D4 .5,D4 2,E4,E4,F4,G4,G4,F4,E4,D4,C4,C4,D4,E4,D4 1.5,C4 .5,C4 2") },
+{ name: "Mary Had a Little Lamb", bpm: 130,
+  desc: "Only four different loop lengths (C, D, E, G) are enough for the whole tune.",
+  build: () => mel("E4,D4,C4,D4,E4,E4,E4 2,D4,D4,D4 2,E4,G4,G4 2,E4,D4,C4,D4,E4,E4,E4,E4,D4,D4,E4,D4,C4 4") },
+{ name: "God Save the King — as on the Ferranti Mark 1 (1951)", bpm: 96,
+  desc: "One of the tunes the Ferranti Mark 1 in Manchester played for a BBC recording in 1951, among the oldest surviving recordings of computer music. Here it's in C, in 3/4 time.",
+  build: () => mel("C4,C4,D4,B3 1.5,C4 .5,D4,E4,E4,F4,E4 1.5,D4 .5,C4,D4,C4,B3,C4 3") },
+{ name: "Daisy Bell — as sung by the IBM 7094 (1961)", bpm: 170,
+  desc: "In 1961 an IBM 7094 at Bell Labs sang \"Daisy Bell\", the first song performed by a computer-synthesised voice. Here it is with a speaker and loops instead.",
+  build: () => mel("G4 3,E4 3,C4 3,G3 3,A3,B3,C4,A3 2,C4,G3 6,D4 3,G4 3,E4 3,C4 3,A3,B3,C4,D4 2,E4,D4 6") },
+{ name: "Arpeggio staircase — Repeats inside a Repeat", bpm: 170,
+  desc: "Four chords (C, F, G, C), each arpeggio played twice by an inner Repeat, and the whole progression played twice by an outer Repeat. Two counter registers (C and E) count the passes.",
+  build: () => [
+    REP(2,
+      REP(2, mel("C4 .5,E4 .5,G4 .5,C5 .5")),
+      REP(2, mel("C4 .5,F4 .5,A4 .5,C5 .5")),
+      REP(2, mel("B3 .5,D4 .5,G4 .5,B4 .5")),
+      REP(2, mel("C4 .5,E4 .5,G4 .5,C5 .5"))),
+    N("C4", 2),
+  ] },
+{ name: "Drum groove — Forever around a Repeat", bpm: 110,
+  desc: "Drums are notes too: a huge loop gives a low thump, a tiny loop a high tick. A Repeat ×3 plays the basic bar, then a fill, and Forever wraps the whole thing. Press Pause to stop.",
+  build: () => [
+    FOREVER(
+      REP(3, D("kick"), D("hat"), D("snare"), D("hat")),
+      D("kick"), D("kick"), D("snare", .5), D("snare", .5), D("snare")),
+  ] },
+{ name: "Beat and melody — taking turns", bpm: 150,
+  desc: "There's only one speaker and one instruction at a time, so drums and melody can't sound together: they take turns, step by step.",
+  build: () => [
+    REP(2,
+      D("kick"), N("E4"), D("hat"), N("G4"), D("snare"), N("C5"), D("hat"), N("G4"),
+      D("kick"), N("F4"), D("hat"), N("A4"), D("snare"), N("C5"), D("hat"), N("A4")),
+    D("kick"), N("C4", 3),
+  ] },
+];
+
+const MINE_KEY = "music-computing-blocks-v1";
+const MINE_DESC = "Your composition: saved automatically in this browser. Add blocks with the + row; put blocks inside a Repeat or Forever to nest them.";
+const starter = () => [N("C4"), N("E4"), N("G4"), REP(2, N("C5", .5), N("G4", .5)), R(1), N("C4", 2)];
+
+/* =================================================================
+   Assembler
+   ================================================================= */
+const REGS = "ABCDEFGH";
+const ARITY = { SET: 2, MOV: 2, ADD: 2, SUB: 2, DEC: 1, JNZ: 2, JGT: 2, JMP: 1, CALL: 1, RET: 0, SLEEP: 1, HOOT: 0, NOP: 0, HALT: 0 };
+function assemble(text) {
+  const lines = text.split("\n"), ins = [], labels = {}, errs = [];
+  const reg = s => (s && s.length === 1) ? REGS.indexOf(s.toUpperCase()) : -1;
+  lines.forEach((raw, li) => {
+    let s = raw.replace(/;.*/, "").trim(); if (!s) return;
+    const lm = s.match(/^([A-Za-z_]\w*):\s*(.*)$/);
+    if (lm) { labels[lm[1].toLowerCase()] = ins.length; s = lm[2].trim(); if (!s) return; }
+    const m = s.match(/^([A-Za-z]+)\s*(.*)$/);
+    if (!m) return errs.push(`Line ${li + 1}: can't read "${s}"`);
+    const op = m[1].toUpperCase(), args = m[2] ? m[2].split(",").map(x => x.trim()) : [];
+    if (!(op in ARITY)) return errs.push(`Line ${li + 1}: unknown instruction "${m[1]}"`);
+    if (args.length !== ARITY[op]) return errs.push(`Line ${li + 1}: ${op} takes ${ARITY[op]} operand(s)`);
+    const I = { op, line: li };
+    if (op === "SET") {
+      I.x = reg(args[0]); I.y = /^-?\d+$/.test(args[1]) ? parseInt(args[1], 10) : NaN;
+      if (I.x < 0 || isNaN(I.y)) errs.push(`Line ${li + 1}: SET needs a register A–H and a whole number`);
+    } else if (op === "ADD" || op === "SUB") {
+      I.x = reg(args[0]); I.yr = reg(args[1]);
+      I.y = I.yr >= 0 ? 0 : /^-?\d+$/.test(args[1]) ? parseInt(args[1], 10) : NaN;
+      if (I.x < 0 || isNaN(I.y)) errs.push(`Line ${li + 1}: ${op} needs a register A–H, then a number or register`);
+    } else if (op === "SLEEP") {
+      I.y = /^\d+$/.test(args[0]) ? parseInt(args[0], 10) : 0;
+      if (I.y < 1) errs.push(`Line ${li + 1}: SLEEP needs a whole number of instruction-times (1 or more)`);
+    } else if (op === "MOV") {
+      I.x = reg(args[0]); I.y = reg(args[1]);
+      if (I.x < 0 || I.y < 0) errs.push(`Line ${li + 1}: MOV needs two registers A–H`);
+    } else if (op === "DEC") {
+      I.x = reg(args[0]); if (I.x < 0) errs.push(`Line ${li + 1}: DEC needs a register A–H`);
+    } else if (op === "JNZ" || op === "JGT") {
+      I.x = reg(args[0]); I.label = args[1].toLowerCase(); if (I.x < 0) errs.push(`Line ${li + 1}: ${op} needs a register A–H`);
+    } else if (op === "JMP" || op === "CALL") I.label = args[0].toLowerCase();
+    ins.push(I);
+  });
+  ins.forEach(I => {
+    if (I.label !== undefined) {
+      if (!(I.label in labels)) errs.push(`Line ${I.line + 1}: unknown label "${I.label}"`);
+      else I.target = labels[I.label];
+    }
+  });
+  if (!errs.length && !ins.length) errs.push("The program is empty.");
+  return { ins, lines, errs };
+}
+
+/* =================================================================
+   Block compiler: blocks -> assembly (plus a line -> block map)
+   ================================================================= */
+function compile(song, rateNow) {
+  const out = [], map = [], beat = 60 / song.bpm * rateNow, need = {};
+  let lab = 0;
+  const emit = (id, label, ins = "", cm = "") => {
+    const s = (label ? (label + ":").padEnd(8) : " ".repeat(8)) + ins.padEnd(14) + (cm ? "; " + cm : "");
+    out.push(s.replace(/\s+$/, "")); map.push(id);
+  };
+  // one sound = N trips round a loop of length L, then silence to fill the slot
+  const play = (id, L, sound, total, cm) => {
+    L = Math.max(6, Math.round(L));
+    const odd = L % 2, B = (L - 4 - odd) / 2, routine = odd ? "toneo" : "tone";
+    const trips = Math.max(1, Math.round(sound / L));
+    const gap = Math.max(1, Math.round(total - trips * L - 4));
+    need[routine] = true;
+    emit(id, "", `SET B,${B}`, cm);
+    emit(id, "", `SET A,${trips * B}`, `${trips} trips round a ${L}-instruction loop`);
+    emit(id, "", `CALL ${routine}`);
+    emit(id, "", `SLEEP ${gap}`, "silence before the next block");
+  };
+  const walk = (list, depth) => {
+    for (const b of list) switch (b.type) {
+      case "note": {
+        const total = b.beats * beat, L = Math.max(6, Math.round(b.loop));
+        play(b.id, L, total * 0.88, total, `♪ ${noteName(rateNow / L)}, ${fmtBeats(b.beats)}`);
+        break;
+      }
+      case "rest":
+        emit(b.id, "", `SLEEP ${Math.max(1, Math.round(b.beats * beat))}`, `rest, ${fmtBeats(b.beats)}`); break;
+      case "drum": {
+        const d = DRUMS[b.kind], total = b.beats * beat;
+        play(b.id, rateNow / d.f, Math.min(d.sec * rateNow, total * 0.9), total, `${b.kind}, ${fmtBeats(b.beats)}`);
+        break;
+      }
+      case "repeat": {
+        if (depth >= CREG.length) { emit(b.id, "", "", "repeat nested too deeply: skipped"); break; }
+        const r = CREG[depth], name = "rep" + (++lab);
+        emit(b.id, "", `SET ${r},${b.times}`, `repeat ${b.times} times (counter ${r})`);
+        emit(b.id, name);
+        walk(b.children, depth + 1);
+        emit(b.id, "", `DEC ${r}`, "one pass done");
+        emit(b.id, "", `JNZ ${r},${name}`, "passes left? go round again");
+        break;
+      }
+      case "forever": {
+        const name = "loop" + (++lab);
+        emit(b.id, name, "", "forever");
+        walk(b.children, depth);
+        emit(b.id, "", `JMP ${name}`, "back to the top, always");
+        break;
+      }
+      case "halt": emit(b.id, "", "HALT", "stop the machine"); break;
+    }
+  };
+  emit(null, "", "", `generated from blocks: ${song.bpm} bpm on a ${rateNow.toLocaleString()} instr/s machine`);
+  walk(song.blocks, 0);
+  emit(null, "", "HALT", "end of the piece");
+  if (need.tone) {
+    emit(null); emit(null, "", "", "---- tone: one trip = HOOT + delay loop = 4 + 2*B instructions ----");
+    emit(null, "tone", "HOOT", "click the speaker");
+    emit(null, "", "MOV D,B");
+    emit(null, "wait", "DEC D");
+    emit(null, "", "JNZ D,wait", "delay loop: bigger B = longer loop = lower pitch");
+    emit(null, "", "SUB A,B");
+    emit(null, "", "JGT A,tone", "more trips left?");
+    emit(null, "", "RET");
+  }
+  if (need.toneo) {
+    emit(null); emit(null, "", "", "---- same, plus one NOP: 5 + 2*B instructions (odd lengths) ----");
+    emit(null, "toneo", "HOOT");
+    emit(null, "", "NOP");
+    emit(null, "", "MOV D,B");
+    emit(null, "waito", "DEC D");
+    emit(null, "", "JNZ D,waito");
+    emit(null, "", "SUB A,B");
+    emit(null, "", "JGT A,toneo");
+    emit(null, "", "RET");
+  }
+  return { code: out.join("\n") + "\n", map };
+}
+
+/* =================================================================
+   Machine state
+   ================================================================= */
+let prog = null, M = null, heat = [], lineEls = [], curLine = -1, lineBlock = [];
+class Queue {
+  constructor() { this.a = []; this.h = 0; }
+  get size() { return this.a.length - this.h; }
+  push(x) { this.a.push(x); }
+  peek() { return this.a[this.h]; }
+  shift() { const x = this.a[this.h++]; if (this.h > 2048) { this.a = this.a.slice(this.h); this.h = 0; } return x; }
+  clear() { this.a = []; this.h = 0; }
+}
+const evQ = new Queue(), pulseQ = new Queue();
+let points = [], lastRise = null;
+let ctx = null, src = null, master = null;
+let running = false, viewT = 0, flashUntil = 0;
+const LOOKAHEAD = 0.12;
+const rate = () => Math.round(Math.pow(10, 0.7 + $("rate").value / 100 * 3.6));
+const rateToSlider = r => (Math.log10(r) - 0.7) / 3.6 * 100;
+const tap = () => $("tap").value;
+const zeroRegs = () => new Array(REGS.length).fill(0);
+
+/* ---------------- audio ---------------- */
+function ensureAudio() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+  src = ctx.createConstantSource(); src.offset.value = 0;
+  const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 25;
+  const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 4500;
+  master = ctx.createGain(); master.gain.value = $("sound").checked ? 0.22 : 0;
+  src.connect(hp); hp.connect(lp); lp.connect(master); master.connect(ctx.destination);
+  src.start();
+}
+function setLevel(v, t) { if (src) src.offset.setValueAtTime(v, t); }
+function silence() {
+  if (!src) return;
+  const t = ctx.currentTime;
+  src.offset.cancelScheduledValues(t); src.offset.setValueAtTime(0, t);
+}
+
+/* ---------------- execution ---------------- */
+function resetMachine() {
+  M = { pc: 0, r: zeroRegs(), s: [], n: 0, halted: false, level: 0, nextT: 0, slept: true };
+  evQ.clear(); pulseQ.clear(); points = []; lastRise = null;
+  heat = heat.map(() => 0);
+  curLine = prog && prog.ins.length ? prog.ins[0].line : -1;
+  showRegs(M.r); clearPlaying();
+  viewT = ctx ? ctx.currentTime : 0;
+}
+
+// executes one instruction at time t; returns how many instruction-times it took
+function execOne(t, dt) {
+  if (M.pc >= prog.ins.length) { M.halted = true; return 1; }
+  const I = prog.ins[M.pc], Rg = M.r;
+  evQ.push({ t, pc: M.pc, r: Rg.slice(), s: M.s.slice(), n: M.n });
+  let next = M.pc + 1, took = 1;
+  switch (I.op) {
+    case "SET": Rg[I.x] = I.y; break;
+    case "MOV": Rg[I.x] = Rg[I.y]; break;
+    case "ADD": Rg[I.x] += I.yr >= 0 ? Rg[I.yr] : I.y; break;
+    case "SUB": Rg[I.x] -= I.yr >= 0 ? Rg[I.yr] : I.y; break;
+    case "DEC": Rg[I.x] -= 1; break;
+    case "JNZ": if (Rg[I.x] !== 0) next = I.target; break;
+    case "JGT": if (Rg[I.x] > 0) next = I.target; break;
+    case "JMP": next = I.target; break;
+    case "CALL":
+      if (M.s.length >= 256) { M.halted = true; next = M.pc; break; }   // runaway recursion
+      M.s.push(M.pc + 1); next = I.target; break;
+    case "RET":
+      if (!M.s.length) { M.halted = true; next = M.pc; } else next = M.s.pop();
+      break;
+    case "SLEEP": took = I.y; M.slept = true; break;
+    case "HOOT":
+      // "fresh" = first click after a silence: it starts a new sound rather than measuring a pitch
+      if (tap() === "hoot") { setLevel(1, t); setLevel(0, t + Math.min(dt, 0.004)); pulseQ.push({ t, fresh: M.slept }); }
+      M.slept = false;
+      break;
+    case "HALT": M.halted = true; next = M.pc; break;
+  }
+  M.pc = next; M.n++;
+  if (tap() === "bit") {
+    const lv = Rg[0] & 1;
+    if (lv !== M.level) {
+      M.level = lv; const te = t + dt;
+      setLevel(lv, te); if (lv === 1) pulseQ.push({ t: te });
+    }
+  }
+  return took;
+}
+
+function pump() {
+  if (!running) return;
+  const now = ctx.currentTime;
+  if (M.nextT < now - 0.25) M.nextT = now + 0.05;      // fell behind (throttled tab)
+  let guard = 0;
+  while (M.nextT < now + LOOKAHEAD && guard++ < 6000) {
+    if (M.halted) {
+      if (!$("repeat").checked) break;
+      setLevel(0, M.nextT);
+      M.pc = 0; M.r = zeroRegs(); M.s = []; M.n = 0; M.halted = false; M.level = 0; M.slept = true; M.nextT += 0.5;
+      continue;
+    }
+    const dt = 1 / rate();
+    M.nextT += dt * execOne(M.nextT, dt);
+  }
+}
+setInterval(pump, 25);
+
+/* ---------------- transport ---------------- */
+async function run() {
+  if (!prog || prog.errs.length) return;
+  ensureAudio(); await ctx.resume();
+  if (M.halted && evQ.size === 0) resetMachine();
+  running = true; M.nextT = ctx.currentTime + 0.08; lastRise = null;
+  syncButtons(); setStatus(`Running at ${rate().toLocaleString()} instr/s`);
+}
+function pause() {
+  if (!running) return;
+  running = false;
+  const e = evQ.peek();
+  if (e) { M.pc = e.pc; M.r = e.r.slice(); M.s = e.s.slice(); M.n = e.n; M.halted = false; M.slept = true; M.level = tap() === "bit" ? (M.r[0] & 1) : 0; }
+  evQ.clear(); pulseQ.clear(); silence();
+  curLine = prog.ins[Math.min(M.pc, prog.ins.length - 1)].line;
+  showRegs(M.r); syncButtons(); setStatus(`Paused after ${M.n.toLocaleString()} instructions`);
+}
+async function step() {
+  if (running || !prog || prog.errs.length) return;
+  ensureAudio(); await ctx.resume();
+  if (M.halted && evQ.size === 0) resetMachine();
+  if (M.halted) return;
+  execOne(ctx.currentTime + 0.02, 1 / rate());
+  setStatus(`Stepped: ${M.n} instructions`);
+}
+function stopAndReset() {
+  running = false; silence(); resetMachine(); renderListing(); syncButtons();
+  setStatus(prog && prog.errs.length ? "Fix the errors to run" : "Ready");
+}
+function syncButtons() {
+  const bad = !prog || prog.errs.length > 0;
+  $("runBtn").textContent = running ? "❚❚ Pause" : "▶ Run";
+  $("runBtn").disabled = bad; $("stepBtn").disabled = bad || running;
+}
+$("runBtn").onclick = () => running ? pause() : run();
+$("stepBtn").onclick = step;
+$("resetBtn").onclick = stopAndReset;
+document.addEventListener("visibilitychange", () => { if (document.hidden) pause(); });
+$("sound").onchange = () => { if (master) master.gain.value = $("sound").checked ? 0.22 : 0; };
+$("tap").onchange = stopAndReset;
+
+/* ---------------- speed ---------------- */
+function showRate() { $("rateOut").textContent = rate().toLocaleString() + " instr/s"; }
+function setRate(r) {
+  $("rate").value = rateToSlider(r);
+  $("machine").value = [...$("machine").options].some(o => o.value == r) ? r : "custom";
+  showRate();
+}
+function rateChanged() {
+  showRate();
+  if (mode === "blocks") { renderBlocks(); scheduleCompile(); }   // pitches move, durations re-fit
+}
+$("machine").onchange = () => {
+  if ($("machine").value !== "custom") $("rate").value = rateToSlider(+$("machine").value);
+  rateChanged();
+};
+$("rate").oninput = () => {
+  const r = rate(), m = [...$("machine").options].find(o => o.value !== "custom" && Math.abs(Math.log(+o.value / r)) < 0.03);
+  $("machine").value = m ? m.value : "custom";
+  rateChanged();
+};
+
+/* =================================================================
+   Program selection, tabs, code view
+   ================================================================= */
+let mode = "blocks", tab = "blocks", editing = false, song = null;
+
+/* ?only=code (used by the "program calls the speaker" slide): list only the programs written directly in code */
+const ONLY_CODE = new URLSearchParams(location.search).get("only") === "code";
+if (ONLY_CODE) document.documentElement.classList.add("only-code");
+
+(function buildPresetMenu() {
+  if (ONLY_CODE) { ASM_PRESETS.forEach((p, i) => $("preset").appendChild(new Option(p.name, "asm:" + i))); return; }
+  const g1 = document.createElement("optgroup"); g1.label = "Compose with blocks";
+  g1.appendChild(new Option("★ My composition (editable, saved in browser)", "mine"));
+  BLOCK_SONGS.forEach((s, i) => g1.appendChild(new Option(s.name, "blk:" + i)));
+  const g2 = document.createElement("optgroup"); g2.label = "Written directly in code";
+  ASM_PRESETS.forEach((p, i) => g2.appendChild(new Option(p.name, "asm:" + i)));
+  $("preset").append(g1, g2);
+})();
+
+function loadSource(text) {
+  running = false; silence();
+  prog = assemble(text);
+  heat = prog.lines.map(() => 0);
+  const e = $("err");
+  e.style.display = prog.errs.length ? "block" : "none"; e.textContent = prog.errs.join("\n");
+  resetMachine(); renderListing(); syncButtons();
+  setStatus(prog.errs.length ? "Fix the errors to run" : "Ready");
+}
+
+function loadPreset(v) {
+  editing = false;
+  if (v.startsWith("asm:")) {
+    const p = ASM_PRESETS[+v.slice(4)];
+    mode = "code"; lineBlock = [];
+    $("tap").value = p.tap; $("repeat").checked = !!p.repeat; setRate(p.rate);
+    $("desc").textContent = p.desc; $("editor").value = p.src;
+    loadSource(p.src); renderBlocks(); showTab("code");
+    return;
+  }
+  mode = "blocks";
+  if (v === "mine") { song = loadMine(); $("desc").textContent = MINE_DESC; }
+  else { const s = BLOCK_SONGS[+v.slice(4)]; song = { bpm: s.bpm, blocks: s.build() }; $("desc").textContent = s.desc; }
+  $("tap").value = "hoot"; $("repeat").checked = false; setRate(BASE_RATE);
+  renderBlocks(); compileNow(); showTab("blocks");
+}
+$("preset").onchange = () => loadPreset($("preset").value);
+
+function showTab(t) {
+  tab = t;
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  $("blocksView").style.display = t === "blocks" ? "block" : "none";
+  $("listing").style.display = t === "code" && !editing ? "block" : "none";
+  $("editor").style.display = t === "code" && editing ? "block" : "none";
+  $("editBtn").style.display = t === "code" && mode === "code" ? "" : "none";
+  $("editBtn").textContent = editing ? "Done editing" : "Edit source";
+}
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+$("editBtn").onclick = () => { editing = !editing; showTab("code"); };
+$("editor").oninput = () => { $("desc").textContent = "Custom program, written in code."; loadSource($("editor").value); };
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function renderListing() {
+  $("listing").innerHTML = prog.lines.map((l, i) => {
+    const k = l.indexOf(";"), code = k < 0 ? l : l.slice(0, k), cm = k < 0 ? "" : l.slice(k);
+    return `<div class="ln"><span class="no">${i + 1}</span><span>${esc(code)}<span class="cm">${esc(cm)}</span></span></div>`;
+  }).join("");
+  lineEls = [...$("listing").children];
+}
+function showRegs(r) {
+  $("regs").innerHTML = REGS.split("").map((n, i) => `<span class="reg"><b>${n}</b>${r[i]}</span>`).join("");
+}
+function setStatus(s) { $("status").textContent = s; }
+function keepVisible(el, box) {
+  if (!el || !box.offsetParent) return;           // hidden view: nothing to scroll
+  const a = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+  if (a.top < b.top || a.bottom > b.bottom) box.scrollTop += a.top - b.top - box.clientHeight / 3;
+}
+
+/* =================================================================
+   Block editor
+   ================================================================= */
+const TITLES = { note: "♪ Note", rest: "𝄽 Rest", drum: "◉ Drum", repeat: "⟳ Repeat", forever: "∞ Forever", halt: "■ Halt" };
+const NOTES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+function noteName(f) {
+  const n = 12 * Math.log2(f / 440) + 69, r = Math.round(n), c = Math.round((n - r) * 100);
+  return `${NOTES[((r % 12) + 12) % 12]}${Math.floor(r / 12) - 1} ${c >= 0 ? "+" : "−"}${Math.abs(c)}¢`;
+}
+function nearestPitch(L) {                   // loop length -> preset name if close to a real note
+  const f = rate() / L, n = 12 * Math.log2(f / 440) + 69, r = Math.round(n), name = SHARPS[((r % 12) + 12) % 12] + (Math.floor(r / 12) - 1);
+  return Math.abs(n - r) < 0.35 && PITCHES.includes(name) ? name : "";
+}
+function noteInfo(L) {
+  L = Math.max(6, Math.round(L)); const f = rate() / L;
+  return `→ ${f < 100 ? f.toFixed(1) : Math.round(f)} Hz ≈ ${noteName(f)}`;
+}
+function newBlock(type) {
+  const b = { id: nid(), type };
+  if (type === "note") { b.loop = Math.round(rate() / PITCH("C4")); b.beats = 1; }
+  if (type === "rest") b.beats = 1;
+  if (type === "drum") { b.kind = "kick"; b.beats = 1; }
+  if (type === "repeat") { b.times = 2; b.children = []; }
+  if (type === "forever") b.children = [];
+  return b;
+}
+function reid(list) { list.forEach(b => { b.id = nid(); if (b.children) reid(b.children); }); return list; }
+function find(id, list = song.blocks) {
+  for (let i = 0; i < list.length; i++) {
+    const b = list[i]; if (b.id === id) return { b, list, i };
+    if (b.children) { const r = find(id, b.children); if (r) return r; }
+  }
+  return null;
+}
+
+function renderBlocks() {
+  const v = $("blocksView"), keep = v.scrollTop;
+  if (mode !== "blocks") {
+    v.innerHTML = `<div class="emptymsg">This example is written directly in machine code. Look at the <b>Code</b> tab, or<br>
+      <button id="newComp">Open my block composition</button></div>`;
+    return;
+  }
+  v.innerHTML = `
+    <div class="btool">Tempo <input type="number" id="bpm" min="30" max="300" value="${song.bpm}"> bpm
+      <button id="clearSong">Clear all</button></div>
+    <p class="hint">Each note is a loop: its <b>loop length</b> (in instructions) sets the pitch. Put blocks inside a Repeat or Forever to nest loops.</p>
+    ${listHtml(song.blocks, "root", 0)}`;
+  v.scrollTop = keep;
+  playingId = null;
+}
+function listHtml(list, parent, depth) { return list.map(b => blockHtml(b, depth)).join("") + addRow(parent, depth); }
+function addRow(parent, depth) {
+  const deep = depth >= CREG.length;
+  return `<div class="add" data-parent="${parent}">add:
+    <button data-add="note">♪ Note</button><button data-add="rest">Rest</button><button data-add="drum">Drum</button>
+    <button data-add="repeat" ${deep ? 'disabled title="Nested too deeply: no counter registers left"' : ""}>⟳ Repeat</button>
+    <button data-add="forever">∞ Forever</button><button data-add="halt">■ Halt</button></div>`;
+}
+function blockHtml(b, depth) {
+  const ctl = `<span class="bctl"><button data-act="up" title="Move up">↑</button><button data-act="down" title="Move down">↓</button><button data-act="dup" title="Duplicate">⧉</button><button data-act="del" title="Delete">✕</button></span>`;
+  const beatsSel = `<select data-k="beats">${BEATS.map(x => `<option value="${x}" ${x == b.beats ? "selected" : ""}>${fmtBeats(x)}</option>`).join("")}</select>`;
+  let inner = "", kids = "", extra = "";
+  if (b.type === "note") {
+    const near = nearestPitch(Math.max(6, b.loop));
+    inner = `<select data-k="pitch"><option value="">custom</option>${PITCHES.map(p => `<option value="${p}" ${p === near ? "selected" : ""}>${p.replace("#", "♯")}</option>`).join("")}</select>
+      loop <input type="number" data-k="loop" min="6" max="5000" value="${b.loop}"> instr ${beatsSel}
+      <span class="info">${noteInfo(b.loop)}</span>`;
+  } else if (b.type === "rest") inner = `silence for ${beatsSel}`;
+  else if (b.type === "drum") {
+    inner = `<select data-k="kind">${Object.entries(DRUMS).map(([k, d]) => `<option value="${k}" ${k === b.kind ? "selected" : ""}>${d.label}</option>`).join("")}</select> ${beatsSel}`;
+  } else if (b.type === "repeat") {
+    inner = `<input type="number" data-k="times" min="1" max="99" value="${b.times}"> times <span class="pass"></span>`;
+    extra = `data-reg="${REGS.indexOf(CREG[Math.min(depth, CREG.length - 1)])}" data-times="${b.times}"`;
+    kids = `<div class="kids">${listHtml(b.children, b.id, depth + 1)}</div>`;
+  } else if (b.type === "forever") {
+    inner = `<span class="info">until you press Pause</span>`;
+    kids = `<div class="kids">${listHtml(b.children, b.id, depth)}</div>`;
+  } else if (b.type === "halt") inner = `<span class="info">stop the machine here</span>`;
+  return `<div class="blk blk-${b.type}" data-id="${b.id}" ${extra}><div class="bh"><span class="bt">${TITLES[b.type]}</span>${inner}${ctl}</div>${kids}</div>`;
+}
+
+/* editing */
+let compileTimer;
+function scheduleCompile() { clearTimeout(compileTimer); compileTimer = setTimeout(compileNow, 200); }
+function compileNow() {
+  if (mode !== "blocks") return;
+  const was = running, { code, map } = compile(song, rate());
+  lineBlock = map; $("editor").value = code;
+  loadSource(code);
+  if (was) run();                     // live edit: restart from the top with the new version
+}
+function changed(rerender) {
+  if (rerender) renderBlocks();
+  try { localStorage.setItem(MINE_KEY, JSON.stringify(song)); } catch (e) {}
+  if ($("preset").value !== "mine") { $("preset").value = "mine"; $("desc").textContent = MINE_DESC; }
+  scheduleCompile();
+}
+function loadMine() {
+  try {
+    const s = JSON.parse(localStorage.getItem(MINE_KEY));
+    if (s && Array.isArray(s.blocks)) return { bpm: clamp(+s.bpm || 120, 30, 300), blocks: reid(s.blocks) };
+  } catch (e) {}
+  return { bpm: 120, blocks: starter() };
+}
+
+$("blocksView").addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.id === "newComp") { $("preset").value = "mine"; return loadPreset("mine"); }
+  if (t.id === "clearSong") { if (confirm("Remove all blocks?")) { song.blocks = []; changed(true); } return; }
+  if (t.dataset.add) {
+    const p = t.closest(".add").dataset.parent;
+    (p === "root" ? song.blocks : find(p).b.children).push(newBlock(t.dataset.add));
+    return changed(true);
+  }
+  if (t.dataset.act) {
+    const { b, list, i } = find(t.closest(".blk").dataset.id), a = t.dataset.act;
+    if (a === "up" && i > 0) [list[i - 1], list[i]] = [list[i], list[i - 1]];
+    else if (a === "down" && i < list.length - 1) [list[i + 1], list[i]] = [list[i], list[i + 1]];
+    else if (a === "dup") list.splice(i + 1, 0, reid([JSON.parse(JSON.stringify(b))])[0]);
+    else if (a === "del") list.splice(i, 1);
+    changed(true);
+  }
+});
+$("blocksView").addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "bpm") { const v = parseInt(t.value, 10); if (v >= 30 && v <= 300) { song.bpm = v; changed(false); } return; }
+  const k = t.dataset.k; if (!k) return;
+  const el = t.closest(".blk"), { b } = find(el.dataset.id);
+  if (k === "beats") b.beats = +t.value;
+  else if (k === "kind") b.kind = t.value;
+  else if (k === "times") { const v = parseInt(t.value, 10); if (!(v >= 1)) return; b.times = clamp(v, 1, 99); el.dataset.times = b.times; }
+  else if (k === "pitch") { if (!t.value) return; b.loop = Math.round(rate() / PITCH(t.value)); el.querySelector("[data-k=loop]").value = b.loop; }
+  else if (k === "loop") { const v = parseInt(t.value, 10); if (!(v >= 6)) return; b.loop = Math.min(5000, v); el.querySelector("[data-k=pitch]").value = nearestPitch(b.loop); }
+  if (b.type === "note") el.querySelector(":scope > .bh .info").textContent = noteInfo(b.loop);
+  changed(false);
+});
+
+/* highlight the block that is playing, and count Repeat passes */
+let playingId = null;
+function setPlaying(id, r) {
+  const view = $("blocksView");
+  if (id !== playingId) {
+    view.querySelectorAll(".blk.playing, .blk.inside").forEach(e => e.classList.remove("playing", "inside"));
+    view.querySelectorAll(".pass").forEach(e => e.textContent = "");
+    playingId = id;
+    const el = id && view.querySelector(`.blk[data-id="${id}"]`);
+    if (el) {
+      el.classList.add("playing");
+      for (let p = el.parentElement.closest(".blk"); p; p = p.parentElement.closest(".blk")) p.classList.add("inside");
+      if (!el.classList.contains("blk-repeat") && !el.classList.contains("blk-forever")) keepVisible(el.firstElementChild, view);
+    }
+  }
+  view.querySelectorAll(".blk-repeat.inside").forEach(e => {
+    const left = r[+e.dataset.reg], times = +e.dataset.times, pass = times - left + 1;
+    e.querySelector(":scope > .bh .pass").textContent = left > 0 && pass >= 1 ? `pass ${pass} of ${times}` : "";
+  });
+}
+function clearPlaying() { if (playingId !== null) setPlaying(null, []); }
+
+/* =================================================================
+   Pitch graph
+   ================================================================= */
+const cv = $("graph"), WIN = 12, NICE = [1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000, 1500, 2000, 3000, 5000];
+let dpr = 1, yLo = Math.log(100), yHi = Math.log(600);
+function fit() { dpr = window.devicePixelRatio || 1; cv.width = cv.clientWidth * dpr; cv.height = cv.clientHeight * dpr; }
+new ResizeObserver(fit).observe(cv);
+
+function draw(tv) {
+  const c = cv.getContext("2d"), W = cv.clientWidth, H = cv.clientHeight;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const L = 58, Rm = 14, T = 14, B = 28, pw = W - L - Rm, ph = H - T - B, t0 = tv - WIN;
+
+  let mn = Infinity, mx = 0;
+  for (const p of points) if (p.t >= t0) { if (p.f < mn) mn = p.f; if (p.f > mx) mx = p.f; }
+  if (mx > 0) {
+    let lo = mn / 1.3, hi = mx * 1.3;
+    if (hi / lo < 4) { const g = Math.sqrt(lo * hi); lo = g / 2; hi = g * 2; }
+    yLo += (Math.log(lo) - yLo) * 0.12; yHi += (Math.log(hi) - yHi) * 0.12;
+  }
+  const Y = f => T + ph * (1 - (Math.log(f) - yLo) / (yHi - yLo));
+  const X = t => L + pw * (t - t0) / WIN;
+
+  c.font = "11px -apple-system, Helvetica, sans-serif"; c.textBaseline = "middle";
+  let lastLabel = -99;
+  c.strokeStyle = "rgba(255,255,255,.08)"; c.fillStyle = "#9b978f"; c.lineWidth = 1;
+  for (const v of NICE) {
+    const y = Y(v); if (y < T || y > T + ph) continue;
+    c.beginPath(); c.moveTo(L, y); c.lineTo(L + pw, y); c.stroke();
+    if (Math.abs(y - lastLabel) > 15) { c.textAlign = "right"; c.fillText(v + " Hz", L - 8, y); lastLabel = y; }
+  }
+  c.textAlign = "center"; c.textBaseline = "top";
+  for (let k = 0; k <= WIN; k += 2) {
+    const x = X(tv - k); c.beginPath(); c.moveTo(x, T); c.lineTo(x, T + ph); c.stroke();
+    c.fillText(k === 0 ? "now" : "−" + k + " s", x, T + ph + 8);
+  }
+  c.strokeStyle = "rgba(255,255,255,.22)"; c.strokeRect(L, T, pw, ph);
+
+  c.save(); c.beginPath(); c.rect(L, T, pw, ph); c.clip();
+  c.strokeStyle = "#f5a65b"; c.fillStyle = "#f5a65b"; c.lineWidth = 2;
+  const vis = points.filter(p => p.t >= t0);
+  if (vis.length < 160) {
+    for (const p of vis) { c.beginPath(); c.arc(X(p.t), Y(p.f), 3, 0, 7); c.fill(); }
+  } else {
+    c.beginPath(); let prev = null, lx = -9;
+    for (const p of vis) {
+      const x = X(p.t), y = Y(p.f);
+      if (!prev || p.t - prev.t > 2.5 / prev.f + 0.002) { c.moveTo(x, y); lx = x; }   // break the line at rests
+      else if (x - lx >= 0.8) { c.lineTo(x, y); lx = x; }
+      prev = p;
+    }
+    c.stroke();
+  }
+  c.restore();
+
+  if (!points.length) {
+    c.fillStyle = "#9b978f"; c.font = "16px 'EB Garamond', Georgia, serif"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText("Press Run: pitch over time will appear here", L + pw / 2, T + ph / 2);
+  }
+}
+
+/* =================================================================
+   Animation loop: everything shown is pulled from the audio clock
+   ================================================================= */
+function frame() {
+  const now = ctx ? ctx.currentTime : 0;
+
+  let last = null;
+  while (evQ.size && evQ.peek().t <= now) { last = evQ.shift(); heat[prog.ins[last.pc].line] = 1; }
+  if (last) {
+    curLine = prog.ins[last.pc].line; showRegs(last.r);
+    if (!last.s.length) {                         // in the main program, not inside a tone routine
+      keepVisible(lineEls[curLine], $("listing"));
+      if (mode === "blocks") setPlaying(lineBlock[curLine] || null, last.r);
+    }
+  }
+
+  while (pulseQ.size && pulseQ.peek().t <= now) {
+    const p = pulseQ.shift();
+    if (lastRise !== null && !p.fresh) {
+      const d = p.t - lastRise;
+      if (d > 0 && d < 1.5) points.push({ t: p.t, f: 1 / d });
+    }
+    lastRise = p.t; flashUntil = performance.now() + 45;
+  }
+  $("cone").classList.toggle("on", performance.now() < flashUntil);
+
+  if (running || evQ.size || pulseQ.size) viewT = now;
+  if (points.length && points[0].t < viewT - WIN - 1) {
+    let k = 0; while (k < points.length && points[k].t < viewT - WIN - 1) k++;
+    points.splice(0, k);
+  }
+
+  if (running && M.halted && !$("repeat").checked && evQ.size === 0) {
+    running = false; silence(); syncButtons(); clearPlaying();
+    setStatus(`Halted after ${M.n.toLocaleString()} instructions`);
+  }
+
+  lineEls.forEach((el, i) => {
+    const cur = i === curLine;
+    if (el._cur !== cur) { el.classList.toggle("cur", cur); el._cur = cur; }
+    const h = Math.round(heat[i] * 100) / 100;
+    if (el._h !== h) { el.style.background = h > 0.02 ? `rgba(245,166,91,${(h * 0.3).toFixed(3)})` : ""; el._h = h; }
+    heat[i] *= 0.9;
+  });
+
+  const lp = points[points.length - 1];
+  if (lp && running && viewT - lastRise < Math.max(0.06, 2.5 / lp.f))
+    $("pitch").innerHTML = `${lp.f < 100 ? lp.f.toFixed(1) : Math.round(lp.f)} Hz <small>≈ ${noteName(lp.f)}</small>`;
+  else $("pitch").innerHTML = `— <small>${running ? "silent" : "not playing"}</small>`;
+
+  draw(viewT);
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- boot ---------------- */
+fit();
+let hasMine = false;
+try { hasMine = !!localStorage.getItem(MINE_KEY); } catch (e) {}
+const askedPreset = new URLSearchParams(location.search).get("preset");   // e.g. ?preset=asm:3 (used by the slides)
+$("preset").value = askedPreset && [...$("preset").options].some(o => o.value === askedPreset) ? askedPreset : (hasMine ? "mine" : "blk:0");
+loadPreset($("preset").value);
+requestAnimationFrame(frame);
+
+/* the slides can switch experiments without reloading: postMessage({ preset: "asm:3" }) */
+addEventListener("message", e => {
+  const v = e.data && e.data.preset;
+  if (!v || ![...$("preset").options].some(o => o.value === v)) return;
+  $("preset").value = v; loadPreset(v);
+});
+</script>
+<script src="../demo-bridge.js"></script>
+</body>
+</html>
