@@ -296,28 +296,50 @@
   const sounds = [...document.querySelectorAll("audio.slide-sound")];
   sounds.forEach(a => {
     a.addEventListener("error", () => { a.dataset.missing = "1"; soundBlocked = false; });
-    a.addEventListener("timeupdate", () => { if (a.dataset.end && a.currentTime >= +a.dataset.end && !a._fading) fadeOut(a); });
-    // Thank you slide: the letters march while the music plays and halt, feet together, when it stops
-    const marchers = [...a.closest(".slide").querySelectorAll(".march .m > span")];
-    a.addEventListener("play", () => marchers.forEach(m => { m.style.animation = ""; }));
-    a.addEventListener("pause", () => marchers.forEach(m =>
-      m.addEventListener("animationiteration", () => { if (a.paused) m.style.animation = "none"; }, { once: true })));
+    a.addEventListener("timeupdate", () => {
+      if (!a.dataset.end) return;
+      if (a.currentTime >= +a.dataset.end + .3) { stopNow(a); return; }      // hard stop, whatever happened to the fade
+      if (a.currentTime >= +a.dataset.end - 1.4 && !a._fading) fadeOut(a);
+    });
+    a.addEventListener("pause", () => haltMarch(a.closest(".slide")));
   });
+  function stopNow(a) { clearInterval(a._fadeTimer); clearTimeout(a._stopTimer); a._fading = false; a.pause(); }
   function fadeOut(a, ms = 1400) {
     clearTimeout(a._stopTimer);
     if (a.paused) return;
-    a._fading = true; const v0 = a.volume, t0 = performance.now();
-    const tick = now => {
-      const k = Math.min(1, (now - t0) / ms);
+    clearInterval(a._fadeTimer);
+    a._fading = true; const v0 = a.volume, t0 = Date.now();
+    a._fadeTimer = setInterval(() => {                                     // a plain timer: never throttled like animation frames
+      const k = Math.min(1, (Date.now() - t0) / ms);
       a.volume = v0 * (1 - k);
-      if (k < 1 && a._fading) requestAnimationFrame(tick); else { a.pause(); a._fading = false; }
-    };
-    requestAnimationFrame(tick);
+      if (k >= 1 || !a._fading) stopNow(a);
+    }, 40);
+  }
+
+  /* Thank you slide: the letters march while the music plays and halt, feet together, after it.
+     The halt is timed from the slide opening (data-end − data-start seconds), so it happens even
+     if the music is blocked; each letter finishes its step, and any straggler is stopped after 1 s. */
+  function marchersOf(s) { return [...s.querySelectorAll(".march .m > span")]; }
+  function startMarch(s) {
+    clearTimeout(s._marchTimer); clearTimeout(s._marchForce);
+    s._gen = (s._gen || 0) + 1; s._halting = false;
+    const ms = marchersOf(s); if (!ms.length) return;
+    ms.forEach(m => { m.style.animation = ""; });
+    const a = s.querySelector("audio.slide-sound");
+    const secs = a && a.dataset.end ? +a.dataset.end - +(a.dataset.start || 0) : 14;
+    s._marchTimer = setTimeout(() => haltMarch(s), secs * 1000);
+  }
+  function haltMarch(s) {
+    const ms = marchersOf(s); if (!ms.length || s._halting) return;
+    s._halting = true; clearTimeout(s._marchTimer);
+    const gen = s._gen;
+    ms.forEach(m => m.addEventListener("animationiteration", () => { if (s._gen === gen) m.style.animation = "none"; }, { once: true }));
+    s._marchForce = setTimeout(() => { if (s._gen === gen) ms.forEach(m => { m.style.animation = "none"; }); }, 1000);
   }
   function playSlideSound(s) {
     const a = s.querySelector("audio.slide-sound");
     if (!a || a.dataset.missing) return;
-    a._fading = false; a.volume = +(a.dataset.vol || 1);
+    clearInterval(a._fadeTimer); a._fading = false; a.volume = +(a.dataset.vol || 1);
     const start = +(a.dataset.start || 0);
     const seek = () => { try { a.currentTime = start; } catch (e) {} };
     if (a.readyState >= 1) seek(); else a.addEventListener("loadedmetadata", seek, { once: true });
@@ -331,7 +353,7 @@
   function toggleSlideSound() {
     const a = slides[cur].querySelector("audio.slide-sound");
     if (!a) return;
-    if (a.paused) playSlideSound(slides[cur]); else fadeOut(a, 600);
+    if (a.paused) { startMarch(slides[cur]); playSlideSound(slides[cur]); } else fadeOut(a, 600);
   }
   // music was refused: the first key press or click starts it (and is not used to turn the page)
   const unlockSound = e => {
@@ -350,6 +372,7 @@
 
   function onEnter(s) {
     soundBlocked = false;
+    startMarch(s);
     playSlideSound(s);
     // lazy-load embedded demos
     s.querySelectorAll("iframe[data-src]").forEach(f => { if (!f.src) f.src = f.dataset.src; });
